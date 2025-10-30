@@ -8,7 +8,8 @@ const outFile = path.join(assetDir, "index.js");
 
 function enc(segment) {
   // Only encode spaces, keep Korean characters as-is
-  return segment.replace(/ /g, "%20");
+  // return segment.replace(/ /g, "%20");
+  return encodeURIComponent(segment);
 }
 
 // Extract the English part from folder name (everything after the last space or korean character)
@@ -23,11 +24,19 @@ function getEnglishPath(folderName) {
 }
 
 function toHref(folder) {
+  // const folderPath = path.join(assetDir, folder);
+  // if (fs.existsSync(path.join(folderPath, "main.html"))) {
+  //   return "asset/" + enc(folder) + "/main.html";
+  // } else {
+  //   return "asset/" + enc(folder) + "/index.html";
+  // }
   const folderPath = path.join(assetDir, folder);
+  const encodedFolder = enc(folder); // "문래원 Piet Mondrian" → "%EB%AC%B8..."
+
   if (fs.existsSync(path.join(folderPath, "main.html"))) {
-    return "asset/" + enc(folder) + "/main.html";
+    return `asset/${encodedFolder}/main.html`; // 상대경로 유지
   } else {
-    return "asset/" + enc(folder) + "/index.html";
+    return `asset/${encodedFolder}/index.html`; // 상대경로 유지
   }
 }
 
@@ -52,16 +61,45 @@ function findThumbnail(folderPath, folderName) {
     return null;
   }
 
-  // Find any image file (case insensitive)
   const imageFiles = files
     .filter((name) => exts.includes(path.extname(name).toLowerCase()))
     .sort((a, b) => a.localeCompare(b, "en", { numeric: true }));
 
   if (imageFiles.length > 0) {
-    return "asset/" + enc(folderName) + "/" + imageFiles[0];
+    // 폴더명 + 파일명 모두 인코딩
+    return `asset/${enc(folderName)}/${enc(imageFiles[0])}`;
   }
-
   return null;
+  // const exts = [
+  //   ".png",
+  //   ".jpg",
+  //   ".jpeg",
+  //   ".webp",
+  //   ".gif",
+  //   ".svg",
+  //   ".bmp",
+  //   ".tiff",
+  // ];
+  // let files;
+  // try {
+  //   files = fs
+  //     .readdirSync(folderPath, { withFileTypes: true })
+  //     .filter((d) => d.isFile())
+  //     .map((d) => d.name);
+  // } catch {
+  //   return null;
+  // }
+
+  // // Find any image file (case insensitive)
+  // const imageFiles = files
+  //   .filter((name) => exts.includes(path.extname(name).toLowerCase()))
+  //   .sort((a, b) => a.localeCompare(b, "en", { numeric: true }));
+
+  // if (imageFiles.length > 0) {
+  //   return "asset/" + enc(folderName) + "/" + imageFiles[0];
+  // }
+
+  // return null;
 }
 
 function parseDescription() {

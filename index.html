@@ -325,12 +325,6 @@
           if (!grid) return;
           var list = window.ASSET_INDEX || [];
           
-          // Wait for ASSET_INDEX to load if not ready
-          if (list.length === 0) {
-            setTimeout(buildGrid, 100);
-            return;
-          }
-          
           // Randomize the order of items on each page load
           var shuffledList = list.slice(); // Create a copy
           for (var i = shuffledList.length - 1; i > 0; i--) {
