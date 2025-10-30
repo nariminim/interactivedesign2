@@ -7,9 +7,21 @@ const assetDir = path.join(root, "asset");
 const outFile = path.join(assetDir, "index.js");
 
 function enc(segment) {
-  // Only encode spaces, keep Korean characters as-is
-  // return segment.replace(/ /g, "%20");
-  return encodeURIComponent(segment);
+  // Normalize to NFC to ensure consistency between macOS (NFD) and Linux (NFC)
+  // This prevents 404 errors when files are served from GitHub Pages (Linux)
+  const normalized = segment.normalize('NFC');
+  return encodeURIComponent(normalized);
+}
+
+// Slugify function for converting folder names to URL-friendly slugs
+// Currently unused, but available for future use if needed
+function slugify(s) {
+  return s
+    .normalize('NFKD')         // Normalize to decomposed form
+    .replace(/[^\x00-\x7F]/g, '') // Remove non-ASCII characters (simple approach)
+    .replace(/\s+/g, '-')       // Replace spaces with hyphens
+    .replace(/[^a-zA-Z0-9\-]/g, '') // Remove special characters
+    .toLowerCase();             // Convert to lowercase
 }
 
 // Extract the English part from folder name (everything after the last space or korean character)
