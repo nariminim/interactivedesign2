@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>kittybunnypony</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background: #f5f1e8;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .curtain-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+        }
+
+        .curtain {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+            backdrop-filter: blur(10px);
+            transition: transform 1.8s cubic-bezier(0.76, 0, 0.24, 1);
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.1);
+        }
+
+        .curtain-left {
+            left: 0;
+            transform-origin: left;
+        }
+
+        .curtain-right {
+            right: 0;
+            transform-origin: right;
+        }
+
+        .curtain.open.curtain-left {
+            transform: translateX(-100%);
+        }
+
+        .curtain.open.curtain-right {
+            transform: translateX(100%);
+        }
+
+        .logo-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 999;
+            opacity: 0;
+        }
+
+        .logo-container img {
+            max-width: 80vw;
+            width: 600px;
+            height: auto;
+            display: block;
+        }
+
+        .logo-container.fade-in {
+            animation: fadeIn 2.5s ease-in-out forwards;
+        }
+
+        .logo-container.fade-out {
+            animation: fadeOut 1.5s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.95);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+        }
+
+        /* 텍스처 효과 */
+        .texture {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.015) 2px, rgba(0, 0, 0, 0.015) 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 0, 0, 0.015) 2px, rgba(0, 0, 0, 0.015) 4px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            .logo-container img {
+                width: 85vw;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="texture"></div>
+
+    <div class="curtain-container">
+        <div class="curtain curtain-left"></div>
+        <div class="curtain curtain-right"></div>
+    </div>
+
+    <div class="logo-container" id="logoContainer">
+        <img id="logoImage" src="logo.png" alt="kittybunnypony">
+    </div>
+
+    <script>
+        window.addEventListener('load', async function () {
+            const curtainLeft = document.querySelector('.curtain-left');
+            const curtainRight = document.querySelector('.curtain-right');
+            const logoContainer = document.getElementById('logoContainer');
+            const logoImage = document.getElementById('logoImage');
+
+            // 로고 이미지 로드
+            try {
+                const fileData = await window.fs.readFile('image.png');
+                const blob = new Blob([fileData], {
+                    type: 'image/png'
+                });
+                const imageUrl = URL.createObjectURL(blob);
+                logoImage.src = imageUrl;
+            } catch (error) {
+                console.error('이미지 로드 실패:', error);
+                // 폴백: 이미지가 없어도 애니메이션은 계속 진행
+            }
+
+            // 1단계: 커튼 열기
+            setTimeout(() => {
+                curtainLeft.classList.add('open');
+                curtainRight.classList.add('open');
+            }, 400);
+
+            // 2단계: 로고 페이드인
+            setTimeout(() => {
+                logoContainer.classList.add('fade-in');
+            }, 2200);
+
+            // 3단계: 로고 페이드아웃
+            setTimeout(() => {
+                logoContainer.classList.remove('fade-in');
+                logoContainer.classList.add('fade-out');
+            }, 5500);
+
+            // 4단계: 다음 페이지로 이동
+            setTimeout(() => {
+                window.location.href = 'main.html';
+            }, 7300);
+        });
+    </script>
+</body>
+
+</html>

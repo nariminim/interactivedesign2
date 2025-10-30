@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Falling Shapes × Pose Collision — click/touch spawn</title>
+
+    <!-- p5 -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.3/lib/p5.min.js"></script>
+    <!-- ml5 (PoseNet 포함, v0.6.0 권장) -->
+    <script src="https://unpkg.com/ml5@0.6.0/dist/ml5.min.js"></script>
+    <!-- matter.js -->
+    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+    <!-- concave 분해 라이브러리 (SVG 도형용, 필수) -->
+    <script src="https://cdn.jsdelivr.net/npm/poly-decomp@0.3.0/build/decomp.min.js"></script>
+    <script>
+      // Matter가 전역 decomp를 찾게 해줌
+      window.decomp = window.decomp || window.polyDecomp || window.decomp;
+    </script>
+
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: #fff;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        touch-action: none;
+      }
+      canvas {
+        display: block;
+      }
+      .hud {
+        position: fixed;
+        left: 10px;
+        bottom: 10px;
+        background: rgba(255, 255, 255, 0.85);
+        padding: 6px 8px;
+        border-radius: 6px;
+        font: 12px/1.4 system-ui;
+        color: #333;
+      }
+      .hud b {
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="hud">
+      <b>상태</b>: <span id="status">로딩…</span> | g: 가이드 · 클릭/터치 = 스폰
+    </div>
+
+    <script>
+      /* ===== CONFIG ===== */
+      const W = 640,
+        H = 480;
+      const GRAVITY = 1,
+        MAX = 140,
+        KP_R = 22;
+      // 검정, 남색, 노랑
+      const PALETTE = ["#000000", "#0b2a6b", "#ffd100"];
+
+      // 사용자 요청한 물결 도형 path
+      const WAVE_PATH =
+        "M.5,8.73v59.65s22.94-14.34,49.9-7.46,39.57,34.41,67.68,21.79,36.71-42.44,61.94-25.81c32.64,21.51,49.32,19.5,94.06,8.6V8.73s-31.81,27.61-51.62,12.04C196.65.5,149.62-15.35,119.8,36.26,89.97,87.88,75.63-30.84.5,8.73Z";
+
+      /* ===== MATTER SHORTCUTS ===== */
+      const { Engine, Bodies, Body, Composite, Vertices, Svg } = Matter;
+
+      /* ===== GLOBALS ===== */
+      let engine,
+        world,
+        video,
+        poseNet,
+        poses = [];
+      let kpBodies = [],
+        falling = [],
+        guide = false,
+        st;
+      let lastTouchSpawnAt = 0,
+        videoReady = false;
+
+      /* ===== 유틸: SVG path → Matter Body ===== */
+      function makeWaveBody(x, y, scale = 0.32) {
+        // 1) 임시 <path>에 d 적용
+        const p = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "path"
+        );
+        p.setAttribute("d", WAVE_PATH);
+        // 2) path → vertices (샘플 간격 12px)
+        let verts = Svg.pathToVertices(p, 12);
+        // 3) 스케일
+        Vertices.scale(verts, scale, scale, { x: 0, y: 0 });
+        // 4) 오목다각형 분해하여 바디 생성 (poly-decomp 필요)
+        return Bodies.fromVertices(
+          x,
+          y,
+          verts,
+          {
+            restitution: 0.12,
+            friction: 0.4,
+            frictionAir: 0.003,
+          },
+          true
+        );
+      }
+
+      /* ===== p5 ===== */
+      function setup() {
+        pixelDensity(1); // iOS에서 스케일 안정화
+        createCanvas(W, H);
+        st = document.getElementById("status");
+
+        // 카메라
+        video = createCapture(
+          { video: { facingMode: "user", width: W, height: H }, audio: false },
+          () => {
+            const v = video.elt;
+            // iOS 필수 속성
+            v.setAttribute("playsinline", "");
+            v.setAttribute("webkit-playsinline", "");
+            v.muted = true;
+            v.autoplay = true;
+            // 첫 사용자 제스처에서 재생 보장
+            const kick = () => v.play().catch(() => {});
+            window.addEventListener("touchstart", kick, { passive: true });
+            window.addEventListener("mousedown", kick, { passive: true });
+            v.onloadedmetadata = () => (videoReady = true);
+          }
+        );
+        video.size(W, H);
+        video.hide();
+
+        // PoseNet
+        poseNet = ml5.poseNet(video, { detectionType: "single" }, () => {
+          st.textContent =
+            "PoseNet 준비 완료 — 화면을 한 번 터치해 카메라 시작";
+        });
+        poseNet.on("pose", (r) => (poses = r));
+
+        // Matter
+        engine = Engine.create();
+        world = engine.world;
+        world.gravity.y = GRAVITY;
+
+        // 인체 키포인트(정적 원형)
+        for (let i = 0; i < 17; i++) {
+          const b = Bodies.circle(width / 2, height / 2, KP_R, {
+            isStatic: true,
+          });
+          kpBodies.push(b);
+          Composite.add(world, b);
+        }
+
+        // 경계(상단 없음)
+        Composite.add(world, [
+          Bodies.rectangle(-20, H / 2, 40, H + 200, { isStatic: true }),
+          Bodies.rectangle(W + 20, H / 2, 40, H + 200, { isStatic: true }),
+          Bodies.rectangle(W / 2, H + 20, W + 200, 40, { isStatic: true }),
+        ]);
+      }
+
+      function draw() {
+        background(255);
+        Engine.update(engine);
+
+        // 좌우 반전된 카메라
+        if (videoReady && video?.elt?.readyState >= 2) {
+          push();
+          translate(width, 0);
+          scale(-1, 1);
+          image(video, 0, 0, width, height);
+          pop();
+        } else {
+          push();
+          fill(0);
+          textAlign(CENTER, CENTER);
+          textSize(14);
+          text(
+            "카메라 초기화 중… 화면을 한 번 터치/클릭 해주세요",
+            width / 2,
+            height / 2
+          );
+          pop();
+        }
+
+        // 포즈 → 충돌 바디 위치 동기화
+        if (poses.length > 0 && poses[0].pose) {
+          const ks = poses[0].pose.keypoints;
+          for (let i = 0; i < Math.min(ks.length, kpBodies.length); i++) {
+            const kp = ks[i],
+              sc = kp?.score ?? 0,
+              x = kp?.position?.x,
+              y = kp?.position?.y;
+            if (sc > 0.2 && isFinite(x) && isFinite(y)) {
+              Body.setPosition(kpBodies[i], { x, y });
+            }
+          }
+          st.textContent = "포즈 감지 중 — 클릭/터치로 스폰";
+        } else {
+          st.textContent = videoReady
+            ? "화면에 들어오면 감지돼요 — 클릭/터치로 스폰"
+            : "화면 터치로 카메라 시작";
+        }
+
+        // 도형 렌더
+        noStroke();
+        for (let i = falling.length - 1; i >= 0; i--) {
+          const f = falling[i];
+          fill(f.color);
+
+          if (f.kind === "circle") {
+            const p = f.body.position;
+            circle(p.x, p.y, f.r * 2);
+          } else if (f.kind === "wave") {
+            // fromVertices로 생성된 합성바디는 parts에 분해된 도형이 들어있음
+            const parts =
+              f.body.parts && f.body.parts.length > 1
+                ? f.body.parts.slice(1)
+                : [f.body];
+            for (const part of parts) {
+              beginShape();
+              for (const v of part.vertices) vertex(v.x, v.y);
+              endShape(CLOSE);
+            }
+          }
+
+          // 화면 아래로 떨어진 것 정리
+          if (f.body.position.y > height + 300) {
+            Composite.remove(world, f.body);
+            falling.splice(i, 1);
+          }
+        }
+
+        // 가이드
+        if (guide) {
+          noStroke();
+          fill(0, 0, 255, 90);
+          for (const b of kpBodies)
+            circle(b.position.x, b.position.y, KP_R * 2);
+        }
+      }
+
+      function keyPressed() {
+        if (key === "g" || key === "G") guide = !guide;
+      }
+
+      /* ===== 입력 이벤트: 클릭/터치 시에만 스폰 ===== */
+      function mousePressed() {
+        video?.elt?.play?.().catch(() => {});
+        spawnAt(constrain(mouseX, 40, width - 40), -40);
+        return false;
+      }
+
+      function touchStarted() {
+        video?.elt?.play?.().catch(() => {});
+        const now = Date.now();
+        if (now - lastTouchSpawnAt > 80) {
+          const tx = touches?.[0]?.x ?? mouseX;
+          spawnAt(constrain(tx, 40, width - 40), -40);
+          lastTouchSpawnAt = now;
+        }
+        return false;
+      }
+
+      /* ===== 스폰 로직 ===== */
+      function spawnAt(x, y) {
+        // 과밀 방지
+        if (falling.length > MAX) {
+          const old = falling.shift();
+          if (old) Composite.remove(world, old.body);
+        }
+
+        const color = random(PALETTE);
+
+        if (Math.random() < 0.7) {
+          // 원
+          const r = random(12, 40);
+          const b = Bodies.circle(x, y, r, {
+            restitution: 0.22,
+            friction: 0.2,
+            frictionAir: 0.002,
+          });
+          Composite.add(world, b);
+          falling.push({ body: b, kind: "circle", color, r });
+        } else {
+          // 물결무늬 막대 (요청한 SVG path)
+          const b = makeWaveBody(x, y, random(0.28, 0.36)); // 크기 감각은 기존 '작은 직사각형'과 유사
+          Composite.add(world, b);
+          falling.push({ body: b, kind: "wave", color });
+        }
+      }
+    </script>
+  </body>
+</html>

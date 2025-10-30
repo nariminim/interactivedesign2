@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Page 5 — Tiles only</title>
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+        background-color: #1b1b1b;
+        touch-action: none;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- core가 캔버스를 붙일 컨테이너 -->
+    <div id="app"></div>
+
+    <!-- 1) 라이브러리 -->
+    <script defer src="../lib/p5.min.js"></script>
+    <script defer src="../lib/p5.sound.js"></script>
+    <script defer src="../lib/matter.min.js"></script>
+
+    <!-- 2) 네 실제 섹션 구현: Section4_PatternTiles()를 정의 -->
+    <script defer src="./section4_tiles.js"></script>
+
+    <!-- 3) UI shim (ui.js 대신 최소 구현) -->
+    <script defer>
+      // core.js가 기대하는 형태: createTabs(labels, onSelect) -> { setActive(idx){} }
+      window.createTabs =
+        window.createTabs ||
+        function (_labels, _onSelect) {
+          return { setActive() {}, destroy() {} };
+        };
+    </script>
+
+    <!-- 4) 섹션 이름 매핑 shim: 0번을 네 섹션으로 고정 -->
+    <script defer>
+      // core는 0번부터 시작하므로 0번 이름을 네 섹션으로 바꿉니다.
+      // (함수 팩토리이므로 그대로 위임 호출)
+      window.Section0_QuarterWeave = (...args) =>
+        window.Section4_PatternTiles(...args);
+      window.Section1_LoomGrid = () => ({});
+      window.Section2_WeftRipple = () => ({});
+      window.Section3_ShuttleChannels = () => ({});
+      // 4번은 원래 네 섹션이므로 유지
+      // window.Section4_PatternTiles는 section4_tiles.js가 이미 정의합니다.
+    </script>
+
+    <!-- 5) core (부팅은 core가 함) -->
+    <script defer src="../app/core.js"></script>
+  </body>
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Falling Circles & Wavy Shape (p5.js + Matter.js)</title>
+    <!-- p5.js -->
+    <script src="https://unpkg.com/p5@1.9.2/lib/p5.min.js"></script>
+    <!-- Matter.js + poly-decomp (for concave SVG verts) -->
+    <script src="https://unpkg.com/matter-js@0.19.0/build/matter.min.js"></script>
+    <script src="https://unpkg.com/poly-decomp@0.3.0/build/decomp.min.js"></script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #ffffff;
+        height: 100%;
+      }
+      canvas {
+        display: block;
+        touch-action: none;
+      } /* 터치 스크롤 방지 */
+    </style>
+  </head>
+  <body>
+    <script>
+      /*
+  요구사항
+  - 위에서 같은 크기의 원(검정/남색/노랑 랜덤)과 "물결무늬 도형"이 떨어짐
+  - 터치 디바이스에서 손가락으로(데스크탑은 마우스로) 도형을 직접 끌어서 이동 가능
+  - 물결무늬 도형의 path:
+    M.5,8.73v59.65s22.94-14.34,49.9-7.46,39.57,34.41,67.68,21.79,36.71-42.44,61.94-25.81c32.64,21.51,49.32,19.5,94.06,8.6V8.73s-31.81,27.61-51.62,12.04C196.65.5,149.62-15.35,119.8,36.26,89.97,87.88,75.63-30.84.5,8.73Z
+*/
+
+      let Engine,
+        Render,
+        World,
+        Bodies,
+        Body,
+        Composite,
+        Composites,
+        Constraint,
+        Mouse,
+        MouseConstraint,
+        Svg,
+        Vertices,
+        Common;
+      let engine, world, mouseConstraint, mouse;
+      let ground, leftWall, rightWall;
+      let wavePath, waveVerts; // 원본 물결 도형의 정점(스케일 전)
+      let waveSourcePathStr =
+        "M.5,8.73v59.65s22.94-14.34,49.9-7.46,39.57,34.41,67.68,21.79,36.71-42.44,61.94-25.81c32.64,21.51,49.32,19.5,94.06,8.6V8.73s-31.81,27.61-51.62,12.04C196.65.5,149.62-15.35,119.8,36.26,89.97,87.88,75.63-30.84.5,8.73Z";
+
+      const COLORS = ["#000000", "#0A2A66", "#FFD400"]; // 검정, 남색, 노랑
+      const CIRCLE_R = 40; // “같은 크기”의 원 반지름
+      const SPAWN_INTERVAL_MS = 650; // 생성 간격
+      const MAX_BODIES = 20;
+
+      let lastSpawn = 0;
+      let canvas;
+
+      function setup() {
+        pixelDensity(window.devicePixelRatio || 1);
+        canvas = createCanvas(windowWidth, windowHeight);
+
+        // Matter aliases
+        Engine = Matter.Engine;
+        World = Matter.World;
+        Bodies = Matter.Bodies;
+        Body = Matter.Body;
+        Composite = Matter.Composite;
+        Common = Matter.Common;
+        Mouse = Matter.Mouse;
+        MouseConstraint = Matter.MouseConstraint;
+        Vertices = Matter.Vertices;
+
+        // poly-decomp 전역 등록 (concave 분해)
+        if (typeof decomp !== "undefined") {
+          Common.setDecomp(decomp);
+        }
+
+        engine = Engine.create();
+        world = engine.world;
+        engine.gravity.y = 1.0; // 낙하 감도(중력)
+
+        // 경계(바닥/좌우 벽)
+        makeBounds();
+
+        // SVG path → vertices (기준 스케일에서 한번만 생성)
+        waveVerts = pathToVertices(waveSourcePathStr, 10); // 샘플 간격 10px로 단순화
+
+        // 마우스/터치 드래그 제약
+        mouse = Mouse.create(canvas.elt);
+        // 고해상도 캔버스에서 좌표 보정
+        const scale = window.devicePixelRatio || 1;
+        mouse.pixelRatio = scale;
+
+        mouseConstraint = MouseConstraint.create(engine, {
+          mouse: mouse,
+          constraint: {
+            stiffness: 0.2,
+            angularStiffness: 0.0,
+            damping: 0.1,
+            render: { visible: false },
+          },
+        });
+        World.add(world, mouseConstraint);
+
+        // 터치에서도 바로 드래그 가능하게 p5 기본 터치 스크롤 방지
+        canvas.elt.addEventListener("touchstart", (e) => e.preventDefault(), {
+          passive: false,
+        });
+        canvas.elt.addEventListener("touchmove", (e) => e.preventDefault(), {
+          passive: false,
+        });
+
+        // 첫 몇 개 미리 생성
+        for (let i = 0; i < 8; i++) spawnRandom();
+
+        Engine.run(engine);
+      }
+
+      function draw() {
+        background(255);
+
+        // 주기적으로 새 도형 생성
+        const now = millis();
+        if (now - lastSpawn > SPAWN_INTERVAL_MS) {
+          lastSpawn = now;
+          spawnRandom();
+        }
+
+        // 너무 많아지면 오래된 것부터 제거
+        pruneBodies();
+
+        // 그리기
+        noStroke();
+        const bodies = Composite.allBodies(world);
+        for (let b of bodies) {
+          if (b.isStatic) {
+            // 경계선은 연하게
+            fill(0, 0, 0, 16);
+            drawBody(b);
+          } else {
+            // 색상은 body.plugin.fillColor에 저장해둠
+            const col =
+              b.plugin && b.plugin.fillColor ? b.plugin.fillColor : "#000000";
+            fill(col);
+            drawBody(b);
+          }
+        }
+      }
+
+      /** 경계 만들기 */
+      function makeBounds() {
+        const th = 40;
+        ground = Bodies.rectangle(width / 2, height + th / 2, width, th, {
+          isStatic: true,
+        });
+        leftWall = Bodies.rectangle(-th / 2, height / 2, th, height * 2, {
+          isStatic: true,
+        });
+        rightWall = Bodies.rectangle(
+          width + th / 2,
+          height / 2,
+          th,
+          height * 2,
+          { isStatic: true }
+        );
+        World.add(world, [ground, leftWall, rightWall]);
+      }
+
+      /** SVG path 문자열을 vertices 배열로 변환 */
+      function pathToVertices(pathStr, sampleLength = 8) {
+        // 임시 <svg><path/></svg>를 만들어 브라우저의 SVG 엔진으로 길이 샘플링
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(svgNS, "svg");
+        const path = document.createElementNS(svgNS, "path");
+        path.setAttribute("d", pathStr);
+        svg.appendChild(path);
+        document.body.appendChild(svg);
+
+        const length = path.getTotalLength();
+        const pts = [];
+        for (let l = 0; l <= length; l += sampleLength) {
+          const p = path.getPointAtLength(l);
+          pts.push({ x: p.x, y: p.y });
+        }
+        // 마지막 점 보장
+        const end = path.getPointAtLength(length);
+        pts.push({ x: end.x, y: end.y });
+
+        document.body.removeChild(svg);
+        // Matter의 Vertices 형태로 반환
+        return pts.map((p) => ({ x: p.x, y: p.y }));
+      }
+
+      /** 물결 도형 Body 생성 */
+      function createWaveBody(cx, cy, scale = 0.9) {
+        // 원본 verts를 스케일 & 원점 기준 이동
+        const verts = waveVerts.map((v) => ({
+          x: v.x * scale,
+          y: v.y * scale,
+        }));
+        // fromVertices는 concave 지원( poly-decomp 필요 )
+        const body = Bodies.fromVertices(
+          cx,
+          cy,
+          verts,
+          {
+            friction: 0.15,
+            restitution: 0.05,
+          },
+          true
+        );
+
+        // 렌더용 색상 (요구는 검정)
+        body.plugin = body.plugin || {};
+        body.plugin.fillColor = "#000000";
+        return body;
+      }
+
+      /** 원 Body 생성 (동일 크기) */
+      function createCircle(x, y, r = CIRCLE_R) {
+        const col = COLORS[Math.floor(Math.random() * COLORS.length)];
+        const c = Bodies.circle(x, y, r, {
+          friction: 0.15,
+          restitution: 0.1,
+        });
+        c.plugin = { fillColor: col };
+        return c;
+      }
+
+      /** 무작위로 원 또는 물결 도형 스폰 */
+      function spawnRandom() {
+        const x = random(60, width - 60);
+        const y = -60;
+
+        // 2:1 정도로 원이 더 자주 나오게
+        const makeCircle = Math.random() < 0.66;
+
+        let b;
+        if (makeCircle) {
+          b = createCircle(x, y, CIRCLE_R);
+        } else {
+          // 물결은 너무 커지지 않게 스케일
+          const s = random(0.7, 0.95) * (width < 480 ? 0.8 : 1.0);
+          b = createWaveBody(x, y, s);
+        }
+        World.add(world, b);
+      }
+
+      /** 오래된 바디 정리 */
+      function pruneBodies() {
+        const bodies = Composite.allBodies(world).filter((b) => !b.isStatic);
+        if (bodies.length <= MAX_BODIES) return;
+
+        // 아래로 너무 내려갔거나 오래된 것부터 제거
+        let removed = 0;
+        for (let b of bodies) {
+          if (removed >= 8) break;
+          if (b.position.y > height + 400) {
+            Composite.remove(world, b);
+            removed++;
+          }
+        }
+        // 그래도 많으면 앞에서 좀 더 제거
+        if (Composite.allBodies(world).length > MAX_BODIES + 10) {
+          const extra = bodies.slice(0, 6);
+          for (let b of extra) Composite.remove(world, b);
+        }
+      }
+
+      /** Matter Body를 p5로 그리기 */
+      function drawBody(body) {
+        beginShape();
+        const parts = body.parts.length > 1 ? body.parts.slice(1) : [body];
+        for (let part of parts) {
+          const verts = part.vertices;
+          beginShape();
+          for (let v of verts) {
+            vertex(v.x, v.y);
+          }
+          endShape(CLOSE);
+        }
+      }
+
+      /** 반응형 */
+      function windowResized() {
+        resizeCanvas(windowWidth, windowHeight);
+        // 기존 벽 제거 후 다시 만들기
+        World.remove(world, ground);
+        World.remove(world, leftWall);
+        World.remove(world, rightWall);
+        makeBounds();
+      }
+
+      // (선택) 모바일에서 스크롤 방지 더블탭 줌 방지
+      document.addEventListener("gesturestart", (e) => e.preventDefault());
+    </script>
+  </body>
+</html>

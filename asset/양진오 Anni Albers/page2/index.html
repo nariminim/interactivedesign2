@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Page N</title>
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+        background-color: #1b1b1b;
+        touch-action: none;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <div id="ui-root">
+      <div id="tabs"></div>
+      <div id="controls"></div>
+      <div id="panel"></div>
+    </div>
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+        background-color: #1b1b1b;
+        touch-action: none;
+        overflow: hidden;
+      }
+    </style>
+
+    <script defer src="../lib/p5.min.js"></script>
+    <script defer src="../lib/p5.sound.js"></script>
+    <script defer src="../lib/matter.min.js"></script>
+
+    <script defer src="./section1_loom.js"></script>
+
+    <script defer>
+      (function forceFirstTo(targetName, realName) {
+        function resolve() {
+          return window[realName] || window[targetName];
+        }
+        function asCallable() {
+          return function (...args) {
+            const Impl = resolve();
+            if (!Impl) {
+              console.error(
+                "Section impl not loaded yet:",
+                targetName,
+                realName
+              );
+              return {};
+            }
+            try {
+              return Impl(...args);
+            } catch {
+              return new Impl(...args);
+            }
+          };
+        }
+        window.Section0_QuarterWeave = asCallable(); // ★ core가 0번부터 시작하므로 필수
+        window[targetName] = asCallable(); // 타깃 이름도 보강
+      })(
+        "SectionX_Target", // ★ core가 기대하는 이름 (예: 'Section4_PatternTiles')
+        "SectionX_Target" // ★ 실제 섹션 파일이 내보내는 전역 이름(같으면 동일)
+      );
+    </script>
+
+    <!-- createTabs 미니 버전 (ui.js 안 쓸 때) -->
+    <script defer>
+      window.createTabs =
+        window.createTabs ||
+        function (labels = [], onSelect) {
+          const root = document.getElementById("tabs") || document.body;
+          root && (root.innerHTML = "");
+          const api = { setActive() {}, destroy() {} };
+          if (root && root !== document.body) {
+            labels.forEach((t, i) => {
+              const b = document.createElement("button");
+              b.className = "tab";
+              b.textContent = String(t ?? `Tab ${i + 1}`);
+              b.addEventListener("click", () => onSelect && onSelect(i));
+              root.appendChild(b);
+            });
+            api.setActive = (i) =>
+              [...root.querySelectorAll(".tab")].forEach((el, idx) =>
+                el.classList.toggle("active", idx === i)
+              );
+            api.destroy = () => {
+              root.innerHTML = "";
+            };
+          }
+          return api;
+        };
+    </script>
+
+    <!-- 마지막에 core.js (그리고 필요 시 ui.js) -->
+    <script defer src="../app/core.js"></script>
+    <!-- <script defer src="../app/ui.js"></script>  // ui.js 쓸 거면 컨테이너(#tabs 등)도 있어야 함 -->
+
+    <!-- 3) 전역 매핑 + 어댑터 -->
+    <script defer>
+      (function forceFirstTo(targetName, realName) {
+        // 호출 순간에 실제 구현을 해석
+        function resolve() {
+          return window[realName] || window[targetName];
+        }
+
+        function asCallable() {
+          return function (...args) {
+            const Impl = resolve();
+            if (!Impl) {
+              console.error(
+                "Section impl not loaded yet:",
+                targetName,
+                realName
+              );
+              return {};
+            }
+            try {
+              return Impl(...args);
+            } catch {
+              return new Impl(...args);
+            }
+          };
+        }
+
+        window.Section0_QuarterWeave = asCallable();
+
+        window[targetName] = asCallable();
+
+        [
+          "Section0_QuarterWeave",
+          "Section1_LoomGrid",
+          "Section2_WeftRipple",
+          "Section3_ShuttleChannels",
+          "Section4_PatternTiles",
+        ].forEach((n) => {
+          if (!window[n])
+            window[n] = function () {
+              return {};
+            };
+        });
+      })(
+        "Section1_LoomGrid", // ← core가 기대하는 전역 섹션 이름
+        "Section1_LoomGrid" // ← 실제 섹션 파일이 만드는 전역 이름
+      );
+    </script>
+
+    <script defer src="../app/core.js"></script>
+  </body>
+</html>

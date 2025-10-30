@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Interactive Book — Main</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      }
+      header,
+      footer {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+      }
+      header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      }
+      footer {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+      }
+      .spacer {
+        flex: 1 1 auto;
+      }
+      .counter {
+        font-weight: 600;
+        min-width: 6ch;
+        text-align: center;
+      }
+      button,
+      select {
+        padding: 0.5rem 0.75rem;
+        font: inherit;
+      }
+      .frame-wrap {
+        width: 100%;
+        height: calc(100vh);
+        max-width: none;
+        margin: 0 auto;
+      }
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <button id="prevBtn" type="button" aria-label="Previous">⟵ Prev</button>
+      <span class="counter" id="pageCounter">1 / 5</span>
+      <button id="nextBtn" type="button" aria-label="Next">Next ⟶</button>
+      <div class="spacer"></div>
+      <label
+        >Jump:
+        <select id="pageSelect"></select
+      ></label>
+    </header>
+
+    <div class="frame-wrap">
+      <iframe
+        id="stage"
+        name="stage"
+        src=""
+        loading="lazy"
+        allow="autoplay; fullscreen"
+      ></iframe>
+    </div>
+
+    <footer>
+      <small>Use ←/→ keys, buttons, or the dropdown to navigate.</small>
+    </footer>
+
+    <script defer>
+      // 프로젝트 루트 기준 경로
+      const PAGES = [
+        "./page1/index.html",
+        "./page2/index.html",
+        "./page3/index.html",
+        "./page4/index.html",
+        "./page5/index.html",
+      ];
+
+      const $iframe = document.getElementById("stage");
+      const $prev = document.getElementById("prevBtn");
+      const $next = document.getElementById("nextBtn");
+      const $count = document.getElementById("pageCounter");
+      const $select = document.getElementById("pageSelect");
+      let idx = 0;
+
+      function initSelect() {
+        $select.innerHTML = "";
+        PAGES.forEach((_, i) => {
+          const opt = document.createElement("option");
+          opt.value = String(i);
+          opt.textContent = `Page ${i + 1}`;
+          $select.appendChild(opt);
+        });
+      }
+
+      function updateUI() {
+        $count.textContent = `${idx + 1} / ${PAGES.length}`;
+        $prev.disabled = idx <= 0;
+        $next.disabled = idx >= PAGES.length - 1;
+        $select.value = String(idx);
+      }
+
+      function loadPage(i, pushHash = true) {
+        idx = Math.max(0, Math.min(PAGES.length - 1, i));
+        $iframe.src = PAGES[idx];
+        if (pushHash) location.hash = `#${idx}`;
+        updateUI();
+      }
+
+      $prev.addEventListener("click", () => loadPage(idx - 1));
+      $next.addEventListener("click", () => loadPage(idx + 1));
+      $select.addEventListener("change", (e) =>
+        loadPage(parseInt(e.target.value, 10))
+      );
+
+      window.addEventListener("keydown", (ev) => {
+        const tag =
+          (document.activeElement && document.activeElement.tagName) || "";
+        if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+        if (ev.key === "ArrowLeft") loadPage(idx - 1);
+        else if (ev.key === "ArrowRight") loadPage(idx + 1);
+      });
+
+      window.addEventListener("hashchange", () => {
+        const n = parseInt(location.hash.replace("#", ""), 10);
+        if (!Number.isNaN(n)) loadPage(n, false);
+      });
+
+      (function boot() {
+        initSelect();
+        const n = parseInt(location.hash.replace("#", ""), 10);
+        loadPage(Number.isNaN(n) ? 0 : n, false);
+      })();
+    </script>
+  </body>
+</html>

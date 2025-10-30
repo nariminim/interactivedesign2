@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>Reactive book 2.0 - Kandinsky Edition</title>
+    <style>
+      html {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        font-family: "Inter", Arial, sans-serif;
+        background-color: #ffffff;
+        color: #000000;
+        padding: 0;
+        box-sizing: border-box;
+
+        overflow: hidden;
+      }
+      h1 {
+        margin: 20px 0;
+      }
+
+      #sketch-display {
+        width: 80vw;
+        height: 80vh;
+        max-width: 1000px;
+        max-height: 2000px;
+
+        border-radius: 12px;
+
+        position: relative;
+        overflow: hidden;
+        background-color: #374151;
+        transition: width 0.3s, height 0.3s;
+      }
+
+      #sketch-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+      }
+
+      .controls {
+        margin-top: 30px;
+
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      button {
+        padding: 10px 15px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        border-radius: 8px;
+        background-color: #242424;
+        color: white;
+        transition: background-color 0.2s, transform 0.1s;
+      }
+
+      button:hover:not(:disabled) {
+        background-color: #4b5563;
+        transform: translateY(-1px);
+      }
+
+      button:focus {
+        outline: 2px solid #4b5563;
+        outline-offset: 2px;
+      }
+
+      button:disabled {
+        background-color: #4b5563;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+
+      #page-info {
+        font-size: 1.1rem;
+        min-width: 60px;
+        text-align: center;
+      }
+
+      #sound-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        background-color: #242424;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        z-index: 1000;
+        transition: background-color 0.2s;
+        font-family: "Inter", Arial, sans-serif;
+      }
+
+      #sound-toggle:hover {
+        background-color: #4b5563;
+      }
+
+      #sound-toggle:focus {
+        outline: 2px solid #4b5563;
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="sound-toggle" onclick="toggleSound()">Sound ON</button>
+
+    <h1>Reactive book 2.0 - Giovanni Pintori Edition</h1>
+
+    <div id="sketch-display">
+      <iframe id="sketch-iframe"></iframe>
+    </div>
+
+    <div class="controls">
+      <button id="prev-btn" onclick="prevSketch()">previous</button>
+      <span id="page-info"></span>
+      <button id="next-btn" onclick="nextSketch()">next</button>
+    </div>
+
+    <script>
+      // 1. 표시할 스케치들의 경로 배열을 정의합니다.
+      const sketches = [
+        "page1/index.html",
+        "page2/index.html",
+        "page3/index.html",
+        "page4/index.html",
+        "page5/index.html",
+      ];
+
+      let currentIndex = 0;
+      const iframe = document.getElementById("sketch-iframe");
+      const pageInfo = document.getElementById("page-info");
+      const prevBtn = document.getElementById("prev-btn");
+      const nextBtn = document.getElementById("next-btn");
+
+      // === 사운드 관련 변수 ===
+      let audioContext;
+      let audioBuffer;
+      let audioLoaded = false;
+      let soundEnabled = false;
+      let soundInterval;
+      let soundPhase = 0;
+      let phaseProgress = 0;
+
+      function loadAudioFile() {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        fetch("MP_Typewriter.mp3")
+          .then((response) => response.arrayBuffer())
+          .then((arrayBuffer) => audioContext.decodeAudioData(arrayBuffer))
+          .then((decodedAudio) => {
+            audioBuffer = decodedAudio;
+            audioLoaded = true;
+            console.log("Sound loaded successfully");
+          })
+          .catch((error) => {
+            console.error("Error loading sound:", error);
+          });
+      }
+
+      function getSoundParameters() {
+        let params = {
+          numLayers: 1,
+          playbackRateMin: 1.0,
+          playbackRateMax: 1.0,
+          volumeMin: 0.15,
+          volumeMax: 0.25,
+          delayMax: 0,
+          intervalMin: 2000,
+          intervalMax: 3000,
+        };
+
+        switch (soundPhase) {
+          case 0:
+            params.numLayers = 1;
+            params.playbackRateMin = 0.6;
+            params.playbackRateMax = 0.9;
+            params.volumeMin = 0.2;
+            params.volumeMax = 0.3;
+            params.delayMax = 0;
+            params.intervalMin = 1800;
+            params.intervalMax = 2800;
+            break;
+
+          case 1:
+            params.numLayers = Math.random() < 0.3 ? 2 : 1;
+            params.playbackRateMin = 0.8;
+            params.playbackRateMax = 1.5;
+            params.volumeMin = 0.2;
+            params.volumeMax = 0.35;
+            params.delayMax = 50;
+            params.intervalMin = 800;
+            params.intervalMax = 1500;
+            break;
+
+          case 2:
+            params.numLayers = Math.floor(Math.random() * 2) + 2; // 2~3개
+            params.playbackRateMin = 1.0;
+            params.playbackRateMax = 2.2;
+            params.volumeMin = 0.15;
+            params.volumeMax = 0.3;
+            params.delayMax = 80;
+            params.intervalMin = 400;
+            params.intervalMax = 900;
+            break;
+
+          case 3:
+            params.numLayers = Math.floor(Math.random() * 3) + 1; // 1~3개
+            params.playbackRateMin = 0.3;
+            params.playbackRateMax = 2.8;
+            params.volumeMin = 0.1;
+            params.volumeMax = 0.4;
+            params.delayMax = 120;
+            params.intervalMin = 300;
+            params.intervalMax = 1200;
+            break;
+        }
+
+        return params;
+      }
+
+      function playGlitchTypewriter() {
+        if (!audioLoaded || !audioBuffer || !soundEnabled) {
+          return;
+        }
+
+        if (audioContext.state === "suspended") {
+          audioContext.resume();
+        }
+
+        const params = getSoundParameters();
+
+        for (let i = 0; i < params.numLayers; i++) {
+          setTimeout(() => {
+            const source = audioContext.createBufferSource();
+            source.buffer = audioBuffer;
+
+            const playbackRate =
+              Math.random() *
+                (params.playbackRateMax - params.playbackRateMin) +
+              params.playbackRateMin;
+            source.playbackRate.value = playbackRate;
+
+            const gainNode = audioContext.createGain();
+            const volume =
+              Math.random() * (params.volumeMax - params.volumeMin) +
+              params.volumeMin;
+            gainNode.gain.value = volume;
+
+            const pannerNode = audioContext.createStereoPanner();
+            pannerNode.pan.value = Math.random() * 1.6 - 0.8;
+
+            source.connect(pannerNode);
+            pannerNode.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            source.start(0);
+          }, Math.random() * params.delayMax);
+        }
+      }
+
+      function startAmbientSound() {
+        if (soundInterval) {
+          clearInterval(soundInterval);
+        }
+
+        soundPhase = 0;
+        phaseProgress = 0;
+
+        playGlitchTypewriter();
+
+        function scheduleNext() {
+          const params = getSoundParameters();
+          const delay =
+            Math.random() * (params.intervalMax - params.intervalMin) +
+            params.intervalMin;
+
+          soundInterval = setTimeout(() => {
+            playGlitchTypewriter();
+
+            phaseProgress++;
+
+            const progressNeeded = Math.floor(Math.random() * 4) + 5;
+            if (phaseProgress >= progressNeeded) {
+              phaseProgress = 0;
+              soundPhase = (soundPhase + 1) % 4;
+              console.log("Sound phase:", soundPhase);
+            }
+
+            scheduleNext();
+          }, delay);
+        }
+
+        scheduleNext();
+      }
+
+      function stopAmbientSound() {
+        if (soundInterval) {
+          clearTimeout(soundInterval);
+          soundInterval = null;
+        }
+        soundPhase = 0;
+        phaseProgress = 0;
+      }
+
+      function toggleSound() {
+        const toggleBtn = document.getElementById("sound-toggle");
+
+        if (!audioLoaded) {
+          loadAudioFile();
+          soundEnabled = true;
+          toggleBtn.textContent = "Sound ON";
+
+          setTimeout(() => {
+            if (soundEnabled && audioLoaded) {
+              startAmbientSound();
+            }
+          }, 500);
+        } else {
+          soundEnabled = !soundEnabled;
+
+          if (soundEnabled) {
+            toggleBtn.textContent = "Sound ON";
+            startAmbientSound();
+          } else {
+            toggleBtn.textContent = "Sound OFF";
+            stopAmbientSound();
+          }
+        }
+      }
+
+      function loadSketch(index) {
+        if (index < 0 || index >= sketches.length) {
+          return;
+        }
+
+        currentIndex = index;
+        iframe.src = sketches[currentIndex];
+
+        pageInfo.textContent = `${currentIndex + 1} / ${sketches.length}`;
+
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === sketches.length - 1;
+
+        if (soundEnabled && audioLoaded) {
+          for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+              playGlitchTypewriter();
+            }, i * 50);
+          }
+        }
+      }
+
+      function prevSketch() {
+        loadSketch(currentIndex - 1);
+      }
+
+      function nextSketch() {
+        loadSketch(currentIndex + 1);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        loadSketch(currentIndex);
+      });
+    </script>
+  </body>
+</html>

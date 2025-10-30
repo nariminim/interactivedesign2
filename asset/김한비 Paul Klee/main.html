@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Doto:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>Reactive book 2.0 - Paul Klee Edition</title>
+    <style>
+      html {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        font-family: "Doto", sans-serif, Arial;
+        background-color: #fdfcfc;
+        color: #000000;
+        padding: 0;
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+
+      h1 {
+        margin: 20px 0;
+      }
+
+      #sketch-display {
+        width: 1200px;
+        height: 600px;
+        max-width: 1200px;
+        max-height: 2000px;
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        position: relative;
+        overflow: hidden;
+        background-color: #4a4c51;
+        transition: width 0.3s, height 0.3s;
+      }
+
+      #sketch-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+      }
+
+      .controls {
+        margin-top: 30px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      button {
+        padding: 10px 15px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        border-radius: 8px;
+        background-color: #888888;
+        color: white;
+        transition: background-color 0.2s, transform 0.1s;
+      }
+      button:hover:not(:disabled) {
+        background-color: #aa0101;
+        transform: translateY(-1px);
+      }
+      button:disabled {
+        background-color: #494949;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+
+      #page-info {
+        font-size: 1.1rem;
+        min-width: 60px;
+        text-align: center;
+      }
+
+      #toggle-img-btn {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 10px 15px;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        background-color: #494949;
+        color: white;
+        cursor: pointer;
+        z-index: 1000;
+        transition: background-color 0.2s, transform 0.1s;
+      }
+      #toggle-img-btn:hover {
+        background-color: #aa0101;
+        transform: translateY(-2px);
+      }
+
+      #corner-img {
+        position: fixed;
+        top: 60px;
+        right: 20px;
+        width: 300px;
+        height: 300px;
+        display: none;
+        border-radius: 8px;
+        object-fit: cover;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        z-index: 999;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Reactive book 2.0 - Paul Klee Edition</h1>
+
+    <button id="toggle-img-btn">O</button>
+    <img id="corner-img" src="" alt="corner image" />
+
+    <div id="sketch-display">
+      <iframe id="sketch-iframe"></iframe>
+    </div>
+
+    <div class="controls">
+      <button id="prev-btn" onclick="prevSketch()">previous</button>
+      <span id="page-info"></span>
+      <button id="next-btn" onclick="nextSketch()">next</button>
+    </div>
+
+    <script>
+      const sketches = [
+        "page1/index.html",
+        "page2/index.html",
+        "page3/index.html",
+        "page4/index.html",
+        "page5/index.html",
+      ];
+
+      const cornerImages = [
+        "images/image1.jpg",
+        "images/image2.jpg",
+        "images/image3.jpg",
+        "images/image4.jpg",
+        "images/image5.jpg",
+      ];
+
+      let currentIndex = 0;
+      const iframe = document.getElementById("sketch-iframe");
+      const pageInfo = document.getElementById("page-info");
+      const prevBtn = document.getElementById("prev-btn");
+      const nextBtn = document.getElementById("next-btn");
+      const toggleBtn = document.getElementById("toggle-img-btn");
+      const cornerImg = document.getElementById("corner-img");
+      let isImgVisible = false;
+
+      function loadSketch(index) {
+        if (index < 0 || index >= sketches.length) return;
+
+        currentIndex = index;
+        iframe.src = sketches[currentIndex];
+        pageInfo.textContent = `${currentIndex + 1} / ${sketches.length}`;
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === sketches.length - 1;
+
+        if (isImgVisible) {
+          cornerImg.src = cornerImages[currentIndex];
+        }
+      }
+
+      function prevSketch() {
+        loadSketch(currentIndex - 1);
+      }
+      function nextSketch() {
+        loadSketch(currentIndex + 1);
+      }
+
+      toggleBtn.addEventListener("click", () => {
+        isImgVisible = !isImgVisible;
+
+        if (isImgVisible) {
+          cornerImg.src = cornerImages[currentIndex];
+          cornerImg.style.display = "block";
+        } else {
+          cornerImg.style.display = "none";
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        loadSketch(currentIndex);
+      });
+    </script>
+  </body>
+</html>

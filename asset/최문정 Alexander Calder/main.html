@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reactive book 2.0 - Alexander Calder Edition</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      html {
+        height: 100%;
+      }
+      body {
+        display: grid;
+        place-items: center;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        font-family: "Inter", Arial, sans-serif;
+        background-color: #ffffff;
+        color: #000000;
+        padding: 0;
+        overflow: hidden;
+      }
+      h1 {
+        text-align: center;
+        position: absolute;
+        top: 2.5vh;
+        left: 0;
+        right: 0;
+        margin: 0;
+        font-size: 1.5rem;
+      }
+
+      /* ★★★ 수정/추가된 h2 스타일 ★★★ */
+      h2 {
+        text-align: center;
+        position: absolute; /* 절대 위치로 설정하여 문서 흐름에서 제외 */
+        top: calc(2.5vh + 1.5rem + 1vh); /* h1 아래에 위치하도록 조정 */
+        left: 0;
+        right: 0;
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 400;
+        color: #4b5563;
+      }
+      /* ---------------------------------- */
+
+      /* 반응형 컨테이너 (비율 유지) */
+      #sketch-display {
+        width: 90vw;
+        height: auto;
+        aspect-ratio: 700 / 1000;
+        max-height: 80vh;
+
+        border: 0px solid #4b5563;
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+        background-color: #f0f0f0; /* 로딩 중 배경색 */
+        transition: width 0.3s, height 0.3s;
+      }
+
+      /* --- ★★★ [핵심 수정] ★★★ --- */
+      /* 스케치가 로드될 iframe 스타일 */
+      #sketch-iframe {
+        /* 1. iframe 크기를 P5 스케치 원본(700x1000)으로 고정 */
+        width: 700px;
+        height: 1000px;
+
+        border: none;
+        display: block;
+
+        /* 2. 변환의 기준점을 중앙으로 설정 */
+        transform-origin: center center;
+
+        /* 3. CSS 변수를 사용하여 변환(transform)을 조합 */
+
+        /* 3-1. JS가 계산할 기본 반응형 스케일 */
+        --base-scale: 1;
+
+        /* 3-2. 각 페이지별 확대/축소 스케일 */
+        --page-scale: 1;
+
+        /* 3-3. 각 페이지별 X/Y 이동 */
+        --page-translate-x: 0%;
+        --page-translate-y: 0%;
+
+        /* 4. 위 변수들을 조합하여 최종 변환 적용 */
+        transform: scale(var(--base-scale)) scale(var(--page-scale))
+          translate(var(--page-translate-x), var(--page-translate-y));
+
+        /* 5. 부드러운 전환 효과 추가 */
+        transition: transform 0.3s ease-out;
+
+        /* 6. iframe을 컨테이너의 정중앙에 배치 (절대 위치 사용) */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        /* 700x1000의 절반만큼(350, 500) 뒤로 이동시켜 중앙 정렬 */
+        margin-top: -500px;
+        margin-left: -350px;
+      }
+
+      /* --- [수정됨] --- */
+      /* 각 페이지 클래스는 이제 CSS 변수만 설정합니다 */
+
+      #sketch-iframe.page1-view {
+        --page-scale: 1;
+        --page-translate-x: 0%;
+        --page-translate-y: 0%;
+      }
+
+      #sketch-iframe.page2-view {
+        --page-scale: 1;
+        --page-translate-x: 0%;
+        --page-translate-y: 0%;
+      }
+
+      #sketch-iframe.page3-view {
+        --page-scale: 1;
+        --page-translate-x: 0%;
+        --page-translate-y: 0%;
+      }
+
+      #sketch-iframe.page4-view {
+        --page-scale: 1.06;
+        --page-translate-x: 0.4%; /* (17px / 700px) */
+        --page-translate-y: 0%; /* (-10px / 1000px) */
+      }
+
+      #sketch-iframe.page5-view {
+        --page-scale: 1;
+        --page-translate-x: 0%;
+        --page-translate-y: 0%;
+      }
+
+      /* 버튼 및 컨트롤 영역 */
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        position: absolute;
+        bottom: 2.5vh;
+        left: 0;
+        right: 0;
+        justify-content: center;
+        margin: 0;
+      }
+      button {
+        padding: 10px 15px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        border-radius: 8px;
+        background-color: #242424;
+        color: white;
+        transition: background-color 0.2s, transform 0.1s;
+      }
+      button:hover:not(:disabled) {
+        background-color: #4f46e5;
+        transform: translateY(-1px);
+      }
+      button:disabled {
+        background-color: #4b5563;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+      #page-info {
+        font-size: 1.1rem;
+        min-width: 60px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Reactive book 2.0</h2>
+    <h1>Alexander Calder</h1>
+    <div id="sketch-display">
+      <iframe id="sketch-iframe" scrolling="no"></iframe>
+    </div>
+
+    <div class="controls">
+      <button id="prev-btn" onclick="prevSketch()">previous</button>
+      <span id="page-info"></span>
+      <button id="next-btn" onclick="nextSketch()">next</button>
+    </div>
+
+    <script>
+      const sketches = [
+        "page1/index.html",
+        "page2/index.html",
+        "page3/index.html",
+        "page4/index.html",
+        "page5/index.html",
+      ];
+
+      let currentIndex = 0;
+      const iframe = document.getElementById("sketch-iframe");
+      const displayContainer = document.getElementById("sketch-display");
+      const pageInfo = document.getElementById("page-info");
+      const prevBtn = document.getElementById("prev-btn");
+      const nextBtn = document.getElementById("next-btn");
+
+      // --- ★★★ [새 함수] ★★★ ---
+      // 컨테이너 크기에 맞춰 iframe의 기본 스케일을 계산하고 적용하는 함수
+      function updateIframeScale() {
+        if (!iframe || !displayContainer) return;
+
+        // 1. 현재 반응형 컨테이너의 너비를 가져옵니다.
+        const containerWidth = displayContainer.clientWidth;
+
+        // 2. iframe의 원본 너비는 700px입니다.
+        const nativeWidth = 700;
+
+        // 3. 컨테이너 너비 / 원본 너비 = 필요한 기본 스케일
+        const baseScale = containerWidth / nativeWidth;
+
+        // 4. iframe의 --base-scale CSS 변수 값을 업데이트합니다.
+        iframe.style.setProperty("--base-scale", baseScale);
+      }
+
+      // 스케치를 로드하고 페이지 정보를 업데이트하는 함수
+      function loadSketch(index) {
+        if (index < 0 || index >= sketches.length) {
+          return;
+        }
+
+        currentIndex = index;
+
+        // [수정] 스케치 로드 시 깜박임을 줄이기 위해 visibility 사용
+        iframe.style.visibility = "hidden";
+
+        iframe.src = sketches[currentIndex];
+
+        // iframe 로드가 완료되면 다시 보이게 처리
+        iframe.onload = () => {
+          iframe.style.visibility = "visible";
+          iframe.onload = null; // 이벤트 리스너 정리
+        };
+
+        // 1. 모든 페이지 클래스 제거
+        iframe.classList.remove(
+          "page1-view",
+          "page2-view",
+          "page3-view",
+          "page4-view",
+          "page5-view"
+        );
+
+        // 2. 현재 인덱스에 맞는 새 클래스 추가
+        const newClass = `page${index + 1}-view`;
+        iframe.classList.add(newClass);
+
+        // 페이지 정보 업데이트
+        pageInfo.textContent = `${currentIndex + 1} / ${sketches.length}`;
+
+        // 버튼 상태 업데이트
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === sketches.length - 1;
+
+        // --- [중요] ---
+        // 페이지가 바뀔 때(클래스가 바뀔 때)도 스케일 계산을 다시 해줄 수 있지만,
+        // --base-scale은 동일하므로 굳이 호출할 필요는 없습니다.
+        // updateIframeScale();
+      }
+
+      function prevSketch() {
+        loadSketch(currentIndex - 1);
+      }
+
+      function nextSketch() {
+        loadSketch(currentIndex + 1);
+      }
+
+      // 페이지 로드 시
+      document.addEventListener("DOMContentLoaded", () => {
+        // 1. 첫 번째 스케치를 로드합니다 (클래스 적용됨).
+        loadSketch(currentIndex);
+
+        // 2. 로드된 스케치의 초기 스케일을 계산하여 적용합니다.
+        updateIframeScale();
+
+        window.addEventListener("resize", updateIframeScale);
+      });
+    </script>
+  </body>
+</html>

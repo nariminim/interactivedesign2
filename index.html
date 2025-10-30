@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2025 Interactive Design(2) Archive</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Arial, sans-serif;
+        background: #fafafa;
+        display: flex;
+      }
+
+      .sidebar {
+        width: 80px;
+        height: 100vh;
+        background: white;
+        border-right: 1px solid #dbdbdb;
+        position: fixed;
+        left: 0;
+        top: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+      }
+
+      .nav-icon {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 15px 0;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: background 0.2s;
+      }
+
+      .nav-icon:hover {
+        background: #f0f0f0;
+      }
+
+      .nav-icon svg {
+        width: 28px;
+        height: 28px;
+      }
+
+      .nav-icon.lang-toggle {
+        margin-top: auto;
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+      }
+
+      .nav-icon.lang-toggle:hover {
+        color: #000;
+      }
+
+      .main-content {
+        margin-left: 80px;
+        flex: 1;
+        padding: 20px;
+      }
+
+      .site-header {
+        max-width: 935px;
+        margin: 0 auto 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #dbdbdb;
+      }
+      .site-header h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #111;
+        margin-bottom: 10px;
+        letter-spacing: -0.01em;
+      }
+      .site-header p {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #444;
+        white-space: pre-line;
+      }
+
+      footer.site-footer {
+        max-width: 935px;
+        margin: 40px auto 20px;
+        padding-top: 20px;
+        border-top: 1px solid #dbdbdb;
+        text-align: center;
+        font-size: 12px;
+        color: #8e8e8e;
+        line-height: 1.5;
+      }
+
+      /* Hide footer when viewer is open */
+      .viewer:not([style*="display: none"]) ~ footer.site-footer {
+        display: none;
+      }
+
+      .viewer {
+        max-width: 935px;
+        margin: 0 auto;
+        display: none;
+      }
+
+      .viewer iframe {
+        width: 100%;
+        height: 80vh;
+        border: 0;
+        background: white;
+      }
+
+      .viewer-controls {
+        max-width: 935px;
+        margin: 0 auto 12px;
+        display: none;
+        display: flex;
+        justify-content: flex-start;
+      }
+
+      .back-btn {
+        appearance: none;
+        border: 1px solid #dbdbdb;
+        background: #fff;
+        border-radius: 8px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .back-btn:hover {
+        background: #f7f7f7;
+      }
+
+      .tabs {
+        display: flex;
+        justify-content: center;
+        gap: 60px;
+        padding: 10px 0 20px;
+        border-bottom: 1px solid #dbdbdb;
+        margin-bottom: 20px;
+      }
+
+      .tab {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 0;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        color: #8e8e8e;
+        transition: color 0.2s;
+      }
+
+      .tab.active {
+        border-bottom: 2px solid #000;
+        color: #000;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+        max-width: 935px;
+        margin: 0 auto;
+      }
+
+      .grid-item {
+        display: block;
+        aspect-ratio: 1;
+        background: linear-gradient(180deg, #d0d0d0 0%, #e8e8e8 100%);
+        position: relative;
+        cursor: pointer;
+        overflow: hidden;
+      }
+
+      /* Removed special background for the first item */
+
+      .grid-item::before {
+        content: "";
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 24px;
+        height: 24px;
+        background: white;
+        border-radius: 4px;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+
+      .grid-item:hover::before {
+        opacity: 0.9;
+      }
+
+      /* Removed radial overlay for the first item */
+
+      /* Thumbnail preview (live) */
+      .grid-item .thumb {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        overflow: hidden;
+      }
+      .grid-item .thumb iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 500%;
+        height: 500%;
+        transform: scale(0.2);
+        transform-origin: 0 0;
+        border: 0;
+        pointer-events: none;
+        background: #fff;
+      }
+
+      /* Label for list mode */
+      .grid-item .label {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        text-align: center;
+        color: #111;
+        background: rgba(255, 255, 255, 0.9);
+        font-size: 18px;
+        line-height: 1.3;
+        font-weight: 600;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+
+      /* Hover reveal in preview mode */
+      .grid-item:hover .label {
+        opacity: 1;
+      }
+
+      /* Toggle modes */
+      .mode-list .grid-item .thumb {
+        display: none;
+      }
+      .mode-list .grid-item .label {
+        opacity: 1;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          width: 60px;
+        }
+
+        .main-content {
+          margin-left: 60px;
+        }
+
+        .grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .grid-item .label {
+          font-size: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar">
+      <div class="nav-icon" style="margin-bottom: 30px">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        </svg>
+      </div>
+
+      <div class="nav-icon lang-toggle" id="langToggle">한/EN</div>
+    </div>
+
+    <div class="main-content">
+      <div class="site-header">
+        <h1 id="site-title">Loading...</h1>
+        <p id="site-description">Loading...</p>
+      </div>
+
+      <div class="grid"></div>
+
+      <footer class="site-footer">
+        <p>© 2025 Narim Lee</p>
+        <p>Built with Claude Sonnet 4.5 and Cursor on October 28, 2025</p>
+      </footer>
+
+      <div id="viewerControls" class="viewer-controls">
+        <button id="backToGrid" class="back-btn" type="button">목록으로</button>
+      </div>
+      <div id="viewer" class="viewer">
+        <iframe name="demoFrame"></iframe>
+      </div>
+    </div>
+    <script src="asset/index.js"></script>
+    <script>
+      (function () {
+        var grid = document.querySelector(".grid");
+        var viewer = document.getElementById("viewer");
+        var viewerControls = document.getElementById("viewerControls");
+        var iframe = viewer ? viewer.querySelector("iframe") : null;
+        var items;
+        var initialState = { view: "grid" };
+        var currentView = "grid"; // Track current view state
+
+        function buildGrid() {
+          if (!grid) return;
+          var list = window.ASSET_INDEX || [];
+          
+          // Wait for ASSET_INDEX to load if not ready
+          if (list.length === 0) {
+            setTimeout(buildGrid, 100);
+            return;
+          }
+          
+          // Randomize the order of items on each page load
+          var shuffledList = list.slice(); // Create a copy
+          for (var i = shuffledList.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = shuffledList[i];
+            shuffledList[i] = shuffledList[j];
+            shuffledList[j] = temp;
+          }
+          
+          grid.innerHTML = "";
+          shuffledList.forEach(function (entry) {
+            var a = document.createElement("a");
+            a.className = "grid-item";
+            a.href = entry.href;
+            a.target = "demoFrame";
+            a.setAttribute("data-opens-viewer", "true");
+            a.setAttribute("aria-label", entry.name);
+            if (entry.thumbnail) {
+              var imgWrap = document.createElement("div");
+              imgWrap.className = "thumb";
+              var img = document.createElement("img");
+              img.src = entry.thumbnail;
+              img.alt = entry.name;
+              img.style.width = "100%";
+              img.style.height = "100%";
+              img.style.objectFit = "cover";
+              imgWrap.appendChild(img);
+              a.appendChild(imgWrap);
+            }
+            var label = document.createElement("div");
+            label.className = "label";
+            label.textContent = entry.name;
+            a.appendChild(label);
+            grid.appendChild(a);
+          });
+          items = document.querySelectorAll(
+            '.grid .grid-item[data-opens-viewer="true"]'
+          );
+        }
+
+        buildGrid();
+
+        // Load site info from generated data
+        function loadSiteInfo() {
+          var titleEl = document.getElementById("site-title");
+          var descEl = document.getElementById("site-description");
+          if (window.SITE_INFO && titleEl && descEl) {
+            titleEl.textContent = window.SITE_INFO.title;
+            descEl.textContent = window.SITE_INFO.description;
+          }
+        }
+        loadSiteInfo();
+
+        // Lazy-init live thumbnails
+        function setupThumbnails() {
+          try {
+            var io = new IntersectionObserver(
+              function (entries) {
+                entries.forEach(function (entry) {
+                  if (entry.isIntersecting) {
+                    var a = entry.target;
+                    // If there's no static thumbnail image, do not create an iframe; show default gradient
+                    io.unobserve(a);
+                  }
+                });
+              },
+              { rootMargin: "200px" }
+            );
+            items.forEach(function (a) {
+              io.observe(a);
+            });
+          } catch (e) {
+            // Fallback: eager load
+            // Do nothing; keep default gradient when thumbnail is missing
+          }
+        }
+        setupThumbnails();
+
+        function showGrid() {
+          currentView = "grid";
+          if (viewer) viewer.style.display = "none";
+          if (viewerControls) viewerControls.style.display = "none";
+          if (grid) grid.style.display = "grid";
+          if (iframe) iframe.src = "about:blank";
+          // Show footer when grid is shown
+          var footer = document.querySelector("footer.site-footer");
+          if (footer) footer.style.display = "block";
+        }
+
+        function showViewer(src) {
+          currentView = "viewer";
+          if (grid) grid.style.display = "none";
+          if (viewerControls) viewerControls.style.display = "flex";
+          if (viewer) viewer.style.display = "block";
+          if (iframe && src) iframe.src = src;
+          // Hide footer when viewer is shown
+          var footer = document.querySelector("footer.site-footer");
+          if (footer) footer.style.display = "none";
+        }
+
+        function renderFromState(state) {
+          if (!state || state.view === "grid") {
+            showGrid();
+          } else if (state.view === "viewer") {
+            showViewer(state.src);
+          }
+        }
+
+        // Initialize - start with grid view
+        showGrid();
+
+        // Wire grid items
+        items.forEach(function (el) {
+          el.addEventListener("click", function (e) {
+            e.preventDefault();
+            var href = el.getAttribute("href");
+            showViewer(href);
+          });
+        });
+
+        // Back to list button
+        var backBtn = document.getElementById("backToGrid");
+        if (backBtn) {
+          backBtn.addEventListener("click", function () {
+            showGrid();
+          });
+        }
+
+        // Sidebar home button -> go to main grid view
+        var homeBtn = document.querySelector(".sidebar .nav-icon:first-child");
+        if (homeBtn) {
+          homeBtn.addEventListener("click", function () {
+            var nextState = { view: "grid" };
+            history.pushState(nextState, "", "#grid");
+            renderFromState(nextState);
+            document.body.classList.remove("mode-list");
+            window.scrollTo(0, 0);
+          });
+        }
+
+        // Language toggle functionality
+        var langToggle = document.getElementById("langToggle");
+        var isEnglish = true; // Default to English
+        var originalTexts = {};
+
+        function saveOriginalTexts() {
+          var titleEl = document.getElementById("site-title");
+          var descEl = document.getElementById("site-description");
+          var backBtn = document.getElementById("backToGrid");
+
+          if (titleEl) originalTexts.title = titleEl.textContent;
+          if (descEl) originalTexts.description = descEl.textContent;
+          if (backBtn) originalTexts.backButton = backBtn.textContent;
+        }
+
+        function translateToEnglish() {
+          var titleEl = document.getElementById("site-title");
+          var descEl = document.getElementById("site-description");
+          var backBtn = document.getElementById("backToGrid");
+
+          if (titleEl)
+            titleEl.textContent = "Reactive books 2.0 : Artist Edition";
+          if (descEl) {
+            // Use English description from SITE_INFO if available, otherwise use hardcoded fallback
+            if (window.SITE_INFO && window.SITE_INFO.descriptionEn) {
+              descEl.textContent = window.SITE_INFO.descriptionEn;
+            } else {
+              descEl.textContent =
+                '"Reactive Book 2.0" is an experimental design project where students reinterpret artworks and designs from artists and designers they were inspired by, using touch-based interactions and physics engines. Starting from a wide range of sources from classical paintings to modern brands, students expanded their own visual interpretations and sensibilities into responsive graphic experiences. Patterns, forms, and compositional elements that existed as static images now change and respond to fingertip movements, becoming an experimental space that connects visual languages from various eras and contexts to contemporary interaction design.\n\n* You can interact with graphics through gestures such as touch, multi-touch, and drag. Some works include sound.\n* Using p5.js, matter.js libraries\n* Homage to John Maeda\'s Reactive books\n\nA student archive from the course Interactive Design (2), 2025 \nTaught by Narim Lee, Hongik University';
+            }
+          }
+          if (backBtn) backBtn.textContent = "Back to List";
+
+          // Translate grid item labels
+          items.forEach(function (item) {
+            var label = item.querySelector(".label");
+            if (label && originalTexts[item.getAttribute("aria-label")]) {
+              originalTexts[item.getAttribute("aria-label")] =
+                label.textContent;
+              // Simple translation for common terms
+              var translations = {
+                matter_basic: "Matter Basic",
+                matter_collision: "Matter Collision",
+                "matter_chamfer shapes": "Matter Chamfer Shapes",
+                matter_svg: "Matter SVG",
+                collisionFilter: "Collision Filter",
+                matter_motion: "Matter Motion",
+                "matter_noise motion": "Matter Noise Motion",
+                engine_gravity: "Engine Gravity",
+                matter_mouseConstraint: "Matter Mouse Constraint",
+                differentShapes: "Different Shapes",
+                "svg test": "SVG Test",
+                constraint: "Constraint",
+                stack: "Stack",
+                chain_basic: "Chain Basic",
+                pointer: "Pointer",
+                textRain: "Text Rain",
+              };
+              var key = item.getAttribute("aria-label").replace(/^\d+\s+/, "");
+              label.textContent = translations[key] || label.textContent;
+            }
+          });
+        }
+
+        function translateToKorean() {
+          var titleEl = document.getElementById("site-title");
+          var descEl = document.getElementById("site-description");
+          var backBtn = document.getElementById("backToGrid");
+
+          if (titleEl && originalTexts.title)
+            titleEl.textContent = originalTexts.title;
+          if (descEl && originalTexts.description)
+            descEl.textContent = originalTexts.description;
+          if (backBtn && originalTexts.backButton)
+            backBtn.textContent = originalTexts.backButton;
+
+          // Restore grid item labels
+          items.forEach(function (item) {
+            var label = item.querySelector(".label");
+            if (label && originalTexts[item.getAttribute("aria-label")]) {
+              label.textContent =
+                originalTexts[item.getAttribute("aria-label")];
+            }
+          });
+        }
+
+        if (langToggle) {
+          // Save original texts after site info is loaded
+          saveOriginalTexts();
+          // Default to English version on page load
+          translateToEnglish();
+          langToggle.textContent = "EN/한";
+          
+          langToggle.addEventListener("click", function () {
+            isEnglish = !isEnglish;
+            if (isEnglish) {
+              translateToEnglish();
+              langToggle.textContent = "EN/한";
+            } else {
+              translateToKorean();
+              langToggle.textContent = "한/EN";
+            }
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>Reactive book 2.0 - Gustav Klimt Edition</title>
+    <style>
+      /* HTML 높이를 100%로 설정하여 body가 정확한 높이를 참조하게 함 */
+      html {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* 수직 중앙 정렬 */
+        align-items: center; /* 수평 중앙 정렬 */
+        width: 100%; /* 명시적 너비 100% 추가 */
+        height: 100%; /* 100% 높이 유지 */
+        margin: 0;
+        font-family: "Inter", Arial, sans-serif;
+        background-color: #faf7e4; /* 다크한 배경 */
+        color: #000000;
+        padding: 0; /* <--- 수직 패딩 완전히 제거 (스크롤바 원인) */
+        box-sizing: border-box;
+        /* 스크롤바 숨기기 (핵심) */
+        overflow: hidden;
+      }
+      h1 {
+        /* h1 상하 마진 조정 */
+        margin: 20px 0;
+      }
+
+      /* --- 스케치 컨테이너: 창 크기에 따라 유동적으로 바뀜 --- */
+      #sketch-display {
+        /* 뷰포트 너비/높이의 80%를 사용하도록 설정 */
+        width: 80vw;
+        height: 80vh;
+        max-width: 1000px; /* 너무 커지는 것을 방지 */
+        max-height: 2000px;
+        /* border: 4px solid #4f46e5; */
+        border-radius: 12px;
+        /* box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); */
+        position: relative;
+        overflow: hidden;
+        background-color: #374151;
+        transition: width 0.3s, height 0.3s;
+      }
+
+      /* 스케치가 로드될 iframe 스타일 */
+      #sketch-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+      }
+
+      /* 버튼 및 컨트롤 영역 */
+      /* 버튼 및 컨트롤 영역 */
+      .controls {
+        /* 상단 마진을 사용하여 sketch-display와 간격 유지 */
+        margin-top: 30px;
+        /* 하단에도 마진을 추가하여 화면 하단과 여백 확보 */
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      button {
+        padding: 10px 15px;
+        font-size: 30px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        border-radius: 8px;
+        background-color: #242424;
+        color: white;
+        transition: background-color 0.2s, transform 0.1s;
+      }
+      button:hover:not(:disabled) {
+        background-color: #424a9c;
+        transform: translateY(-1px);
+      }
+
+      button:disabled {
+        background-color: #221c17;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+
+      #page-info {
+        font-size: 1.4rem;
+        min-width: 60px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Reactive book 2.0 - Gustav Klimt Edition</h1>
+
+    <div id="sketch-display">
+      <iframe id="sketch-iframe"></iframe>
+    </div>
+
+    <div class="controls">
+      <button id="prev-btn" onclick="prevSketch()">prev</button>
+      <span id="page-info"></span>
+      <button id="next-btn" onclick="nextSketch()">next</button>
+    </div>
+
+    <script>
+      // 1. 표시할 스케치들의 경로 배열을 정의합니다.
+      // 각 요소는 독립적인 P5 스케치가 포함된 index.html의 경로입니다.
+      const sketches = [
+        "page1/index.html",
+        "page2/index.html",
+        "page3/index.html",
+        "page4/index.html",
+        "page5/index.html",
+        // 여기에 더 많은 스케치를 추가할 수 있습니다.
+      ];
+
+      let currentIndex = 0; // 현재 표시 중인 스케치의 인덱스
+      const iframe = document.getElementById("sketch-iframe");
+      const pageInfo = document.getElementById("page-info");
+      const prevBtn = document.getElementById("prev-btn");
+      const nextBtn = document.getElementById("next-btn");
+
+      // 스케치를 로드하고 페이지 정보를 업데이트하는 함수
+      function loadSketch(index) {
+        // 인덱스 유효성 검사
+        if (index < 0 || index >= sketches.length) {
+          return;
+        }
+
+        currentIndex = index;
+        iframe.src = sketches[currentIndex];
+
+        // 페이지 정보 업데이트 (1부터 시작하도록 +1)
+        pageInfo.textContent = `${currentIndex + 1} / ${sketches.length}`;
+
+        // 버튼 활성화/비활성화 상태 업데이트
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === sketches.length - 1;
+      }
+
+      // '이전' 버튼 클릭 시 호출되는 함수
+      function prevSketch() {
+        loadSketch(currentIndex - 1);
+      }
+
+      // '다음' 버튼 클릭 시 호출되는 함수
+      function nextSketch() {
+        loadSketch(currentIndex + 1);
+      }
+
+      // 페이지 로드 시 첫 번째 스케치를 보여줍니다.
+      document.addEventListener("DOMContentLoaded", () => {
+        loadSketch(currentIndex);
+      });
+    </script>
+  </body>
+</html>

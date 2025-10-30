@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>Reactive Book - Final Harmony</title>
+    <style>
+      @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
+
+      html {
+        height: 100%;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* 화면 중앙에 정확히 배치 */
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        font-family: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+        background-color: #f2f2f0; /* 은은한 미색 배경 */
+        color: #2a2a2a;
+        overflow: hidden;
+        transition: background-color 0.5s ease;
+      }
+
+      h1 {
+        margin: 0 0 24px 0;
+        font-weight: 600;
+        font-size: 1.5rem;
+        letter-spacing: 0.02em;
+        color: #2a2a2a;
+      }
+
+      /* --- 스케치 컨테이너 --- */
+      #sketch-display {
+        width: 76vw;
+        height: 70vh;
+        max-width: 1000px;
+        border-radius: 14px;
+        position: relative;
+        overflow: hidden;
+        background-color: #1e1f22; /* 깊이 있는 다크 톤 */
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12),
+          inset 0 0 28px rgba(255, 255, 255, 0.05);
+        transition: transform 0.4s ease, filter 0.4s ease;
+      }
+
+      #sketch-display:hover {
+        filter: brightness(1.05);
+        transform: scale(1.005);
+      }
+
+      /* --- iframe --- */
+      #sketch-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+        opacity: 0;
+        transition: opacity 0.7s ease;
+      }
+
+      /* --- 버튼 컨트롤 --- */
+      .controls {
+        margin-top: 28px; /* 캔버스와 버튼 사이 여백 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 28px; /* 버튼 사이 충분한 간격 */
+      }
+
+      button {
+        padding: 9px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        cursor: pointer;
+        background-color: #f6f6f6;
+        color: #2a2a2a;
+        transition: background-color 0.3s ease, transform 0.1s ease,
+          box-shadow 0.2s ease;
+      }
+
+      button:hover:not(:disabled) {
+        background-color: #e8e8ea;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+      }
+
+      button:disabled {
+        background-color: #d0d0d0;
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      #page-info {
+        font-size: 1rem;
+        min-width: 60px;
+        text-align: center;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        color: #3a3a3a;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Reactive Book - Final Harmony</h1>
+
+    <div id="sketch-display">
+      <iframe id="sketch-iframe"></iframe>
+    </div>
+
+    <div class="controls">
+      <button id="prev-btn" onclick="prevSketch()">‹ previous</button>
+      <span id="page-info"></span>
+      <button id="next-btn" onclick="nextSketch()">next ›</button>
+    </div>
+
+    <script>
+      const sketches = [
+        "page1/index.html",
+        "page2/index.html",
+        "page3/index.html",
+        "page4/index.html",
+        "page5/index.html",
+        "page6/index.html",
+      ];
+
+      let currentIndex = 0;
+      const iframe = document.getElementById("sketch-iframe");
+      const pageInfo = document.getElementById("page-info");
+      const prevBtn = document.getElementById("prev-btn");
+      const nextBtn = document.getElementById("next-btn");
+
+      function loadSketch(index) {
+        if (index < 0 || index >= sketches.length) return;
+        iframe.style.opacity = 0;
+
+        setTimeout(() => {
+          currentIndex = index;
+          iframe.src = sketches[currentIndex] + "?t=" + new Date().getTime();
+          pageInfo.textContent = `${currentIndex + 1} / ${sketches.length}`;
+          prevBtn.disabled = currentIndex === 0;
+          nextBtn.disabled = currentIndex === sketches.length - 1;
+
+          setTimeout(() => {
+            iframe.style.opacity = 1;
+          }, 200);
+        }, 200);
+      }
+
+      function prevSketch() {
+        loadSketch(currentIndex - 1);
+      }
+
+      function nextSketch() {
+        loadSketch(currentIndex + 1);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        loadSketch(currentIndex);
+      });
+    </script>
+  </body>
+</html>
