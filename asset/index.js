@@ -10,7 +10,7 @@ window.ASSET_INDEX = [
     "thumbnail": "asset/%EA%B3%BD%EC%9D%80%EB%B9%84%20Marimekko/thumbnail.jpg"
   },
   {
-    "name": "권수현 Maison Margiela",
+    "name": "권수현 Maison Margiela",
     "href": "asset/%EA%B6%8C%EC%88%98%ED%98%84%20Maison%20Margiela/main.html",
     "thumbnail": "asset/%EA%B6%8C%EC%88%98%ED%98%84%20Maison%20Margiela/thumbnail.jpg"
   },
