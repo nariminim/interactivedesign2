@@ -48,7 +48,7 @@ function toHref(folder) {
   if (fs.existsSync(path.join(folderPath, "main.html"))) {
     return `asset/${encodedFolder}/main.html`; // 상대경로 유지
   } else {
-    return `asset/${encodedFolder}/index.html`; // 상대경로 유지
+    return `asset/${encodedFolder}/index.html`; // 상대경로 유지.
   }
 }
 
