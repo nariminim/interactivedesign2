@@ -1,5 +1,10 @@
 window.ASSET_INDEX = [
   {
+    "name": "Maison Margiela",
+    "href": "asset/Maison%20Margiela/main.html",
+    "thumbnail": "asset/Maison%20Margiela/thumbnail.jpg"
+  },
+  {
     "name": "XU MUXUE Josef Albers",
     "href": "asset/XU%20MUXUE%20Josef%20Albers/main.html",
     "thumbnail": "asset/XU%20MUXUE%20Josef%20Albers/thumbnail.jpg"
@@ -8,11 +13,6 @@ window.ASSET_INDEX = [
     "name": "곽은비 Marimekko",
     "href": "asset/%EA%B3%BD%EC%9D%80%EB%B9%84%20Marimekko/main.html",
     "thumbnail": "asset/%EA%B3%BD%EC%9D%80%EB%B9%84%20Marimekko/thumbnail.jpg"
-  },
-  {
-    "name": "권수현 Maison Margiela",
-    "href": "asset/%E1%84%80%E1%85%AF%E1%86%AB%E1%84%89%E1%85%AE%E1%84%92%E1%85%A7%E1%86%AB%20Maison%20Margiela/main.html",
-    "thumbnail": "asset/%E1%84%80%E1%85%AF%E1%86%AB%E1%84%89%E1%85%AE%E1%84%92%E1%85%A7%E1%86%AB%20Maison%20Margiela/thumbnail.jpg"
   },
   {
     "name": "김동현 Piet Mondrian",
