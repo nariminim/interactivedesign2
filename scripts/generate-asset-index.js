@@ -9,12 +9,6 @@ const outFile = path.join(assetDir, "index.js");
 function enc(segment) {
   // Normalize to NFC to ensure consistency between macOS (NFD) and Linux (NFC)
   // This prevents 404 errors when files are served from GitHub Pages (Linux)
-  // Exception: 권수현 folder is stored as NFD in Git, so convert to NFD
-  if (segment.includes('권수현') || segment.includes('Maison Margiela')) {
-    // For 권수현 folder, convert to NFD to match Git storage
-    const nfd = segment.normalize('NFD');
-    return encodeURIComponent(nfd);
-  }
   const normalized = segment.normalize('NFC');
   return encodeURIComponent(normalized);
 }
