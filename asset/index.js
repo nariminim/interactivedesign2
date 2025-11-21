@@ -11,8 +11,8 @@ window.ASSET_INDEX = [
   },
   {
     "name": "권수현 Maison Margiela",
-    "href": "asset/%EA%B6%8C%EC%88%98%ED%98%84%20Maison%20Margiela/main.html",
-    "thumbnail": "asset/%EA%B6%8C%EC%88%98%ED%98%84%20Maison%20Margiela/thumbnail.jpg"
+    "href": "asset/%E1%84%80%E1%85%AF%E1%86%AB%E1%84%89%E1%85%AE%E1%84%92%E1%85%A7%E1%86%AB%20Maison%20Margiela/main.html",
+    "thumbnail": "asset/%E1%84%80%E1%85%AF%E1%86%AB%E1%84%89%E1%85%AE%E1%84%92%E1%85%A7%E1%86%AB%20Maison%20Margiela/thumbnail.jpg"
   },
   {
     "name": "김동현 Piet Mondrian",
