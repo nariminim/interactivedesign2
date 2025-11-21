@@ -6,8 +6,8 @@ window.ASSET_INDEX = [
   },
   {
     "name": "곽은비 Marimekko",
-    "href": "asset/%EA%B3%BD%EC%9D%80%EB%B9%84%20Marimekko/main.html",
-    "thumbnail": "asset/%EA%B3%BD%EC%9D%80%EB%B9%84%20Marimekko/thumbnail.jpg"
+    "href": "asset/%E1%84%80%E1%85%AA%E1%86%A8%E1%84%8B%E1%85%B3%E1%86%AB%E1%84%87%E1%85%B5%20Marimekko/main.html",
+    "thumbnail": "asset/%E1%84%80%E1%85%AA%E1%86%A8%E1%84%8B%E1%85%B3%E1%86%AB%E1%84%87%E1%85%B5%20Marimekko/thumbnail.jpg"
   },
   {
     "name": "권수현 Maison Margiela",
@@ -16,93 +16,93 @@ window.ASSET_INDEX = [
   },
   {
     "name": "김동현 Piet Mondrian",
-    "href": "asset/%EA%B9%80%EB%8F%99%ED%98%84%20Piet%20Mondrian/main.html",
-    "thumbnail": "asset/%EA%B9%80%EB%8F%99%ED%98%84%20Piet%20Mondrian/thumbnail.png"
+    "href": "asset/%E1%84%80%E1%85%B5%E1%86%B7%E1%84%83%E1%85%A9%E1%86%BC%E1%84%92%E1%85%A7%E1%86%AB%20Piet%20Mondrian/main.html",
+    "thumbnail": "asset/%E1%84%80%E1%85%B5%E1%86%B7%E1%84%83%E1%85%A9%E1%86%BC%E1%84%92%E1%85%A7%E1%86%AB%20Piet%20Mondrian/thumbnail.png"
   },
   {
     "name": "김서영 kittybunnypony",
-    "href": "asset/%EA%B9%80%EC%84%9C%EC%98%81%20kittybunnypony/main.html",
-    "thumbnail": "asset/%EA%B9%80%EC%84%9C%EC%98%81%20kittybunnypony/thumbnail.png"
+    "href": "asset/%E1%84%80%E1%85%B5%E1%86%B7%E1%84%89%E1%85%A5%E1%84%8B%E1%85%A7%E1%86%BC%20kittybunnypony/main.html",
+    "thumbnail": "asset/%E1%84%80%E1%85%B5%E1%86%B7%E1%84%89%E1%85%A5%E1%84%8B%E1%85%A7%E1%86%BC%20kittybunnypony/thumbnail.png"
   },
   {
     "name": "김윤아 Josef Albers",
-    "href": "asset/%EA%B9%80%EC%9C%A4%EC%95%84%20Josef%20Albers/main.html",
-    "thumbnail": "asset/%EA%B9%80%EC%9C%A4%EC%95%84%20Josef%20Albers/thumbnail.jpeg"
+    "href": "asset/%E1%84%80%E1%85%B5%E1%86%B7%E1%84%8B%E1%85%B2%E1%86%AB%E1%84%8B%E1%85%A1%20Josef%20Albers/main.html",
+    "thumbnail": "asset/%E1%84%80%E1%85%B5%E1%86%B7%E1%84%8B%E1%85%B2%E1%86%AB%E1%84%8B%E1%85%A1%20Josef%20Albers/thumbnail.jpeg"
   },
   {
     "name": "김은총 Giovanni Pintori",
-    "href": "asset/%EA%B9%80%EC%9D%80%EC%B4%9D%20Giovanni%20Pintori/main.html",
-    "thumbnail": "asset/%EA%B9%80%EC%9D%80%EC%B4%9D%20Giovanni%20Pintori/thumbnail.jpg"
+    "href": "asset/%E1%84%80%E1%85%B5%E1%86%B7%E1%84%8B%E1%85%B3%E1%86%AB%E1%84%8E%E1%85%A9%E1%86%BC%20Giovanni%20Pintori/main.html",
+    "thumbnail": "asset/%E1%84%80%E1%85%B5%E1%86%B7%E1%84%8B%E1%85%B3%E1%86%AB%E1%84%8E%E1%85%A9%E1%86%BC%20Giovanni%20Pintori/thumbnail.jpg"
   },
   {
     "name": "김한비 Paul Klee",
-    "href": "asset/%EA%B9%80%ED%95%9C%EB%B9%84%20Paul%20Klee/main.html",
-    "thumbnail": "asset/%EA%B9%80%ED%95%9C%EB%B9%84%20Paul%20Klee/thumbnail.png"
+    "href": "asset/%E1%84%80%E1%85%B5%E1%86%B7%E1%84%92%E1%85%A1%E1%86%AB%E1%84%87%E1%85%B5%20Paul%20Klee/main.html",
+    "thumbnail": "asset/%E1%84%80%E1%85%B5%E1%86%B7%E1%84%92%E1%85%A1%E1%86%AB%E1%84%87%E1%85%B5%20Paul%20Klee/thumbnail.png"
   },
   {
     "name": "노유진 Malevich",
-    "href": "asset/%EB%85%B8%EC%9C%A0%EC%A7%84%20Malevich/main.html",
-    "thumbnail": "asset/%EB%85%B8%EC%9C%A0%EC%A7%84%20Malevich/thumbnail.jpeg"
+    "href": "asset/%E1%84%82%E1%85%A9%E1%84%8B%E1%85%B2%E1%84%8C%E1%85%B5%E1%86%AB%20Malevich/main.html",
+    "thumbnail": "asset/%E1%84%82%E1%85%A9%E1%84%8B%E1%85%B2%E1%84%8C%E1%85%B5%E1%86%AB%20Malevich/thumbnail.jpeg"
   },
   {
     "name": "문래원 Piet Mondrian",
-    "href": "asset/%EB%AC%B8%EB%9E%98%EC%9B%90%20Piet%20Mondrian/main.html",
-    "thumbnail": "asset/%EB%AC%B8%EB%9E%98%EC%9B%90%20Piet%20Mondrian/thumbnail.png"
+    "href": "asset/%E1%84%86%E1%85%AE%E1%86%AB%E1%84%85%E1%85%A2%E1%84%8B%E1%85%AF%E1%86%AB%20Piet%20Mondrian/main.html",
+    "thumbnail": "asset/%E1%84%86%E1%85%AE%E1%86%AB%E1%84%85%E1%85%A2%E1%84%8B%E1%85%AF%E1%86%AB%20Piet%20Mondrian/thumbnail.png"
   },
   {
     "name": "박신유 Bruno Munari",
-    "href": "asset/%EB%B0%95%EC%8B%A0%EC%9C%A0%20Bruno%20Munari/main.html",
-    "thumbnail": "asset/%EB%B0%95%EC%8B%A0%EC%9C%A0%20Bruno%20Munari/thumbnail.png"
+    "href": "asset/%E1%84%87%E1%85%A1%E1%86%A8%E1%84%89%E1%85%B5%E1%86%AB%E1%84%8B%E1%85%B2%20Bruno%20Munari/main.html",
+    "thumbnail": "asset/%E1%84%87%E1%85%A1%E1%86%A8%E1%84%89%E1%85%B5%E1%86%AB%E1%84%8B%E1%85%B2%20Bruno%20Munari/thumbnail.png"
   },
   {
     "name": "송유림 MUJI",
-    "href": "asset/%EC%86%A1%EC%9C%A0%EB%A6%BC%20MUJI/main.html",
-    "thumbnail": "asset/%EC%86%A1%EC%9C%A0%EB%A6%BC%20MUJI/thumbnail.png"
+    "href": "asset/%E1%84%89%E1%85%A9%E1%86%BC%E1%84%8B%E1%85%B2%E1%84%85%E1%85%B5%E1%86%B7%20MUJI/main.html",
+    "thumbnail": "asset/%E1%84%89%E1%85%A9%E1%86%BC%E1%84%8B%E1%85%B2%E1%84%85%E1%85%B5%E1%86%B7%20MUJI/thumbnail.png"
   },
   {
     "name": "양진오 Anni Albers",
-    "href": "asset/%EC%96%91%EC%A7%84%EC%98%A4%20Anni%20Albers/main.html",
-    "thumbnail": "asset/%EC%96%91%EC%A7%84%EC%98%A4%20Anni%20Albers/thumbnail.jpeg"
+    "href": "asset/%E1%84%8B%E1%85%A3%E1%86%BC%E1%84%8C%E1%85%B5%E1%86%AB%E1%84%8B%E1%85%A9%20Anni%20Albers/main.html",
+    "thumbnail": "asset/%E1%84%8B%E1%85%A3%E1%86%BC%E1%84%8C%E1%85%B5%E1%86%AB%E1%84%8B%E1%85%A9%20Anni%20Albers/thumbnail.jpeg"
   },
   {
     "name": "유준희 Gustav Klimt",
-    "href": "asset/%EC%9C%A0%EC%A4%80%ED%9D%AC%20Gustav%20Klimt/main.html",
-    "thumbnail": "asset/%EC%9C%A0%EC%A4%80%ED%9D%AC%20Gustav%20Klimt/thumbnail.png"
+    "href": "asset/%E1%84%8B%E1%85%B2%E1%84%8C%E1%85%AE%E1%86%AB%E1%84%92%E1%85%B4%20Gustav%20Klimt/main.html",
+    "thumbnail": "asset/%E1%84%8B%E1%85%B2%E1%84%8C%E1%85%AE%E1%86%AB%E1%84%92%E1%85%B4%20Gustav%20Klimt/thumbnail.png"
   },
   {
     "name": "이상민 Bridget Riley",
-    "href": "asset/%EC%9D%B4%EC%83%81%EB%AF%BC%20Bridget%20Riley/main.html",
-    "thumbnail": "asset/%EC%9D%B4%EC%83%81%EB%AF%BC%20Bridget%20Riley/thumbnail.png"
+    "href": "asset/%E1%84%8B%E1%85%B5%E1%84%89%E1%85%A1%E1%86%BC%E1%84%86%E1%85%B5%E1%86%AB%20Bridget%20Riley/main.html",
+    "thumbnail": "asset/%E1%84%8B%E1%85%B5%E1%84%89%E1%85%A1%E1%86%BC%E1%84%86%E1%85%B5%E1%86%AB%20Bridget%20Riley/thumbnail.png"
   },
   {
     "name": "이예진 Paul Klee",
-    "href": "asset/%EC%9D%B4%EC%98%88%EC%A7%84%20Paul%20Klee/main.html",
-    "thumbnail": "asset/%EC%9D%B4%EC%98%88%EC%A7%84%20Paul%20Klee/thumbnail.jpg"
+    "href": "asset/%E1%84%8B%E1%85%B5%E1%84%8B%E1%85%A8%E1%84%8C%E1%85%B5%E1%86%AB%20Paul%20Klee/main.html",
+    "thumbnail": "asset/%E1%84%8B%E1%85%B5%E1%84%8B%E1%85%A8%E1%84%8C%E1%85%B5%E1%86%AB%20Paul%20Klee/thumbnail.jpg"
   },
   {
     "name": "이재원 Whanki Kim",
-    "href": "asset/%EC%9D%B4%EC%9E%AC%EC%9B%90%20Whanki%20Kim/index.html",
-    "thumbnail": "asset/%EC%9D%B4%EC%9E%AC%EC%9B%90%20Whanki%20Kim/thumbnail.png"
+    "href": "asset/%E1%84%8B%E1%85%B5%E1%84%8C%E1%85%A2%E1%84%8B%E1%85%AF%E1%86%AB%20Whanki%20Kim/index.html",
+    "thumbnail": "asset/%E1%84%8B%E1%85%B5%E1%84%8C%E1%85%A2%E1%84%8B%E1%85%AF%E1%86%AB%20Whanki%20Kim/thumbnail.png"
   },
   {
     "name": "이혜린 El Lissitzky",
-    "href": "asset/%EC%9D%B4%ED%98%9C%EB%A6%B0%20El%20Lissitzky/index.html",
-    "thumbnail": "asset/%EC%9D%B4%ED%98%9C%EB%A6%B0%20El%20Lissitzky/thumbnail.png"
+    "href": "asset/%E1%84%8B%E1%85%B5%E1%84%92%E1%85%A8%E1%84%85%E1%85%B5%E1%86%AB%20El%20Lissitzky/index.html",
+    "thumbnail": "asset/%E1%84%8B%E1%85%B5%E1%84%92%E1%85%A8%E1%84%85%E1%85%B5%E1%86%AB%20El%20Lissitzky/thumbnail.png"
   },
   {
     "name": "정지혜 Byun YoungWon",
-    "href": "asset/%EC%A0%95%EC%A7%80%ED%98%9C%20Byun%20YoungWon/index.html",
-    "thumbnail": "asset/%EC%A0%95%EC%A7%80%ED%98%9C%20Byun%20YoungWon/thumbnail.png"
+    "href": "asset/%E1%84%8C%E1%85%A5%E1%86%BC%E1%84%8C%E1%85%B5%E1%84%92%E1%85%A8%20Byun%20YoungWon/index.html",
+    "thumbnail": "asset/%E1%84%8C%E1%85%A5%E1%86%BC%E1%84%8C%E1%85%B5%E1%84%92%E1%85%A8%20Byun%20YoungWon/thumbnail.png"
   },
   {
     "name": "최문정 Alexander Calder",
-    "href": "asset/%EC%B5%9C%EB%AC%B8%EC%A0%95%20Alexander%20Calder/main.html",
-    "thumbnail": "asset/%EC%B5%9C%EB%AC%B8%EC%A0%95%20Alexander%20Calder/thumbnail.jpg"
+    "href": "asset/%E1%84%8E%E1%85%AC%E1%84%86%E1%85%AE%E1%86%AB%E1%84%8C%E1%85%A5%E1%86%BC%20Alexander%20Calder/main.html",
+    "thumbnail": "asset/%E1%84%8E%E1%85%AC%E1%84%86%E1%85%AE%E1%86%AB%E1%84%8C%E1%85%A5%E1%86%BC%20Alexander%20Calder/thumbnail.jpg"
   },
   {
     "name": "최서현 Karel Martens",
-    "href": "asset/%EC%B5%9C%EC%84%9C%ED%98%84%20Karel%20Martens/index.html",
-    "thumbnail": "asset/%EC%B5%9C%EC%84%9C%ED%98%84%20Karel%20Martens/thumbnail.png"
+    "href": "asset/%E1%84%8E%E1%85%AC%E1%84%89%E1%85%A5%E1%84%92%E1%85%A7%E1%86%AB%20Karel%20Martens/index.html",
+    "thumbnail": "asset/%E1%84%8E%E1%85%AC%E1%84%89%E1%85%A5%E1%84%92%E1%85%A7%E1%86%AB%20Karel%20Martens/thumbnail.png"
   }
 ];
 window.SITE_INFO = {

@@ -7,10 +7,10 @@ const assetDir = path.join(root, "asset");
 const outFile = path.join(assetDir, "index.js");
 
 function enc(segment) {
-  // Normalize to NFC to ensure consistency between macOS (NFD) and Linux (NFC)
-  // This prevents 404 errors when files are served from GitHub Pages (Linux)
-  const normalized = segment.normalize('NFC');
-  return encodeURIComponent(normalized);
+  // Use the segment as-is without normalization
+  // GitHub Pages will handle the encoding based on how the files are stored in Git
+  // Normalization can cause mismatches between local (NFD) and Git (may be NFD or NFC)
+  return encodeURIComponent(segment);
 }
 
 // Slugify function for converting folder names to URL-friendly slugs
