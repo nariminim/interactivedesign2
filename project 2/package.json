@@ -1,0 +1,13 @@
+{
+  "name": "digitalworkshop2",
+  "version": "1.0.0",
+  "description": "Auto-generate HTML from description files",
+  "scripts": {
+    "generate": "node generate-html.js",
+    "watch": "node watch-descriptions.js"
+  },
+  "devDependencies": {
+    "chokidar": "^3.5.3"
+  }
+}
+

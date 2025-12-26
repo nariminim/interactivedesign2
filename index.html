@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>2025 Interactive Design(2) Archive</title>
+    <title>Interactive Design - Project Archive</title>
     <style>
       * {
         margin: 0;
@@ -53,6 +53,18 @@
         height: 28px;
       }
 
+      .nav-icon.project-nav {
+        font-size: 18px;
+        font-weight: 600;
+        color: #666;
+        cursor: pointer;
+      }
+
+      .nav-icon.project-nav:hover {
+        color: #000;
+        background: #f0f0f0;
+      }
+
       .nav-icon.lang-toggle {
         margin-top: auto;
         font-size: 12px;
@@ -72,12 +84,12 @@
 
       .site-header {
         max-width: 935px;
-        margin: 0 auto 20px;
+        margin: 10px 10px 20px;
         padding-bottom: 16px;
         border-bottom: 1px solid #dbdbdb;
       }
       .site-header h1 {
-        font-size: 24px;
+        font-size: 26px;
         font-weight: 700;
         color: #111;
         margin-bottom: 10px;
@@ -88,6 +100,15 @@
         line-height: 1.6;
         color: #444;
         white-space: pre-line;
+      }
+      
+      .site-header p .small-text {
+        font-size: 12px;
+        color: #8e8e8e;
+        display: block;
+        margin-top: 16px;
+        line-height: 1.5;
+        white-space: normal;
       }
 
       footer.site-footer {
@@ -281,11 +302,16 @@
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
         >
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 0 0 1 1h3m10-11l2 2m-2-2v10a1 1 0 0 1-1 1h-3m-6 0a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1m-6 0h6" />
         </svg>
       </div>
+
+      <div class="nav-icon project-nav" id="project1" data-project="1">1</div>
+      <div class="nav-icon project-nav" id="project2" data-project="2">2</div>
 
       <div class="nav-icon lang-toggle" id="langToggle">한/EN</div>
     </div>
@@ -300,7 +326,7 @@
 
       <footer class="site-footer">
         <p>© 2025 Narim Lee</p>
-        <p>Built with Claude Sonnet 4.5 and Cursor on October 28, 2025</p>
+        <p>Built with Claude Sonnet 4.5 and Cursor</p>
       </footer>
 
       <div id="viewerControls" class="viewer-controls">
@@ -367,13 +393,68 @@
 
         buildGrid();
 
-        // Load site info from generated data
-        function loadSiteInfo() {
+        // description.txt 파일을 파싱하는 함수
+        function parseDescriptionFile(text) {
+          const parts = text.split('===');
+          const koreanPart = parts[0].trim();
+          const englishPart = parts.length > 1 ? parts[1].trim() : null;
+          
+          const koreanLines = koreanPart.split('\n');
+          const title = koreanLines[0].trim() || 'Reactive books 2.0 : Artist Edition';
+          const description = koreanLines.slice(1).join('\n').trim();
+          
+          let result = { title, description };
+          if (englishPart) {
+            result.descriptionEn = englishPart;
+          }
+          
+          return result;
+        }
+
+        // Load site info from description.txt
+        async function loadSiteInfo() {
           var titleEl = document.getElementById("site-title");
           var descEl = document.getElementById("site-description");
-          if (window.SITE_INFO && titleEl && descEl) {
-            titleEl.textContent = window.SITE_INFO.title;
-            descEl.textContent = window.SITE_INFO.description;
+          
+          try {
+            const response = await fetch('description.txt');
+            const text = await response.text();
+            const data = parseDescriptionFile(text);
+            
+            if (titleEl) {
+              titleEl.textContent = data.title;
+            }
+            
+            if (descEl) {
+              // 설명에 footer 텍스트 자동 추가
+              const footerText = 'A student archive from the course Interactive Design (2), 2025 Course led by Narim Lee, Hongik University';
+              descEl.innerHTML = data.description.replace(/\n/g, '<br>') + '<span class="small-text">' + footerText + '</span>';
+            }
+            
+            // 영어 버전도 저장 (언어 토글용)
+            if (data.descriptionEn) {
+              window.SITE_INFO = {
+                title: data.title,
+                description: data.description,
+                descriptionEn: data.descriptionEn
+              };
+            }
+            
+            // loadSiteInfo 완료 후 언어 토글 초기화
+            if (langToggle) {
+              saveOriginalTexts();
+              // Default to Korean version on page load
+              isEnglish = false;
+              langToggle.textContent = "한/EN";
+            }
+          } catch (error) {
+            console.error('Error loading description.txt:', error);
+            // Fallback to SITE_INFO if available
+            if (window.SITE_INFO && titleEl && descEl) {
+              titleEl.textContent = window.SITE_INFO.title;
+              const footerText = 'A student archive from the course Interactive Design (2), 2025 Course led by Narim Lee, Hongik University';
+              descEl.innerHTML = window.SITE_INFO.description.replace(/\n/g, '<br>') + '<span class="small-text">' + footerText + '</span>';
+            }
           }
         }
         loadSiteInfo();
@@ -465,6 +546,22 @@
           });
         }
 
+        // Project navigation buttons
+        var project1Btn = document.getElementById("project1");
+        var project2Btn = document.getElementById("project2");
+        
+        if (project1Btn) {
+          project1Btn.addEventListener("click", function () {
+            window.location.href = "index.html";
+          });
+        }
+        
+        if (project2Btn) {
+          project2Btn.addEventListener("click", function () {
+            window.location.href = "project 2/index.html";
+          });
+        }
+
         // Language toggle functionality
         var langToggle = document.getElementById("langToggle");
         var isEnglish = true; // Default to English
@@ -476,11 +573,16 @@
           var backBtn = document.getElementById("backToGrid");
 
           if (titleEl) originalTexts.title = titleEl.textContent;
-          if (descEl) originalTexts.description = descEl.textContent;
+          if (descEl) {
+            // footer 텍스트 제외하고 저장
+            var descHTML = descEl.innerHTML;
+            var footerPattern = /<span class="small-text">.*?<\/span>/;
+            originalTexts.description = descHTML.replace(footerPattern, '').replace(/<br>/g, '\n').replace(/<[^>]*>/g, '');
+          }
           if (backBtn) originalTexts.backButton = backBtn.textContent;
         }
 
-        function translateToEnglish() {
+        async function translateToEnglish() {
           var titleEl = document.getElementById("site-title");
           var descEl = document.getElementById("site-description");
           var backBtn = document.getElementById("backToGrid");
@@ -488,12 +590,24 @@
           if (titleEl)
             titleEl.textContent = "Reactive books 2.0 : Artist Edition";
           if (descEl) {
-            // Use English description from SITE_INFO if available, otherwise use hardcoded fallback
-            if (window.SITE_INFO && window.SITE_INFO.descriptionEn) {
-              descEl.textContent = window.SITE_INFO.descriptionEn;
-            } else {
-              descEl.textContent =
-                '"Reactive Book 2.0" is an experimental design project where students reinterpret artworks and designs from artists and designers they were inspired by, using touch-based interactions and physics engines. Starting from a wide range of sources from classical paintings to modern brands, students expanded their own visual interpretations and sensibilities into responsive graphic experiences. Patterns, forms, and compositional elements that existed as static images now change and respond to fingertip movements, becoming an experimental space that connects visual languages from various eras and contexts to contemporary interaction design.\n\n* You can interact with graphics through gestures such as touch, multi-touch, and drag. Some works include sound.\n* Using p5.js, matter.js libraries\n* Homage to John Maeda\'s Reactive books\n\nA student archive from the course Interactive Design (2), 2025 \nTaught by Narim Lee, Hongik University';
+            try {
+              // description.txt에서 영어 버전 읽기
+              const response = await fetch('description.txt');
+              const text = await response.text();
+              const data = parseDescriptionFile(text);
+              
+              var description = data.descriptionEn || '';
+              if (!description) {
+                // Fallback
+                description = '"Reactive Book 2.0" is an experimental design project where students reinterpret artworks and designs from artists and designers they were inspired by, using touch-based interactions and physics engines. Starting from a wide range of sources from classical paintings to modern brands, students expanded their own visual interpretations and sensibilities into responsive graphic experiences. Patterns, forms, and compositional elements that existed as static images now change and respond to fingertip movements, becoming an experimental space that connects visual languages from various eras and contexts to contemporary interaction design.\n\n* You can interact with graphics through gestures such as touch, multi-touch, and drag. Some works include sound.\n* Using p5.js, matter.js libraries\n* Homage to John Maeda\'s Reactive books';
+              }
+              
+              // footer 텍스트 자동 추가
+              const footerText = 'A student archive from the course Interactive Design (2), 2025 Course led by Narim Lee, Hongik University';
+              descEl.innerHTML = description.replace(/\n/g, '<br>') + '<span class="small-text">' + footerText + '</span>';
+            } catch (error) {
+              console.error('Error loading English description:', error);
+              descEl.textContent = 'Loading...';
             }
           }
           if (backBtn) backBtn.textContent = "Back to List";
@@ -529,15 +643,53 @@
           });
         }
 
-        function translateToKorean() {
+        async function translateToKorean() {
           var titleEl = document.getElementById("site-title");
           var descEl = document.getElementById("site-description");
           var backBtn = document.getElementById("backToGrid");
 
-          if (titleEl && originalTexts.title)
-            titleEl.textContent = originalTexts.title;
-          if (descEl && originalTexts.description)
-            descEl.textContent = originalTexts.description;
+          if (titleEl) {
+            try {
+              // description.txt에서 한글 버전 읽기
+              const response = await fetch('description.txt');
+              const text = await response.text();
+              const data = parseDescriptionFile(text);
+              
+              titleEl.textContent = data.title || originalTexts.title || 'Reactive books 2.0 : Artist Edition';
+            } catch (error) {
+              console.error('Error loading Korean title:', error);
+              if (originalTexts.title) {
+                titleEl.textContent = originalTexts.title;
+              }
+            }
+          }
+          
+          if (descEl) {
+            try {
+              // description.txt에서 한글 버전 읽기
+              const response = await fetch('description.txt');
+              const text = await response.text();
+              const data = parseDescriptionFile(text);
+              
+              var description = data.description || '';
+              if (!description && originalTexts.description) {
+                description = originalTexts.description;
+              }
+              
+              // footer 텍스트 자동 추가
+              const footerText = 'A student archive from the course Interactive Design (2), 2025 Course led by Narim Lee, Hongik University';
+              descEl.innerHTML = description.replace(/\n/g, '<br>') + '<span class="small-text">' + footerText + '</span>';
+            } catch (error) {
+              console.error('Error loading Korean description:', error);
+              if (originalTexts.description) {
+                const footerText = 'A student archive from the course Interactive Design (2), 2025 Course led by Narim Lee, Hongik University';
+                descEl.innerHTML = originalTexts.description.replace(/\n/g, '<br>') + '<span class="small-text">' + footerText + '</span>';
+              } else {
+                descEl.textContent = 'Loading...';
+              }
+            }
+          }
+          
           if (backBtn && originalTexts.backButton)
             backBtn.textContent = originalTexts.backButton;
 
@@ -552,19 +704,13 @@
         }
 
         if (langToggle) {
-          // Save original texts after site info is loaded
-          saveOriginalTexts();
-          // Default to English version on page load
-          translateToEnglish();
-          langToggle.textContent = "EN/한";
-          
           langToggle.addEventListener("click", function () {
             isEnglish = !isEnglish;
             if (isEnglish) {
-              translateToEnglish();
+              translateToEnglish().catch(err => console.error('Error translating to English:', err));
               langToggle.textContent = "EN/한";
             } else {
-              translateToKorean();
+              translateToKorean().catch(err => console.error('Error translating to Korean:', err));
               langToggle.textContent = "한/EN";
             }
           });
