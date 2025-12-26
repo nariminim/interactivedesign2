@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="../">
+    <title>p5.js example</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden; /* 스크롤 제거 */
+        background-color: #1b1b1b;
+      }
+
+      main {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      svg {
+        width: 0;
+        height: 0;
+        display: block;
+      }
+    </style>
+
+    <!-- p5.js -->
+    <script src="p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pathseg@1.2.1/pathseg.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.min.js"></script>
+    <script src="sketch.js"></script>
+  </head>
+
+  <body>
+    <main>
+      <svg>
+        <path 
+          id="myShape" 
+          d="M511.3,552.8c-57.2-39.4-132.9,13.2-116.1,80.6s.5,2.8,1.1,4.1c41.8,102.8-31.1,129.2-45.5,197.6-18.4,87.3,123.6,271.1,188.4,19.9,23.3-90.4,110.1-58.7,190-46,152.1,24.2,135.9-84,63.9-155.3-24.5-24.3-47.2-49.8-81.3-44.5s-114.9,2.5-200.4-56.5Z"
+        ></path>
+      </svg>  
+    </main>
+  </body>
+</html>
