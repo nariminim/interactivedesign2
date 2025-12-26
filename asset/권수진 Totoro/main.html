@@ -110,12 +110,14 @@
     <script>
       // 1. 표시할 스케치들의 경로 배열을 정의합니다.
       // 각 요소는 독립적인 P5 스케치가 포함된 index.html의 경로입니다.
+      // 현재 페이지의 base URL을 기준으로 절대 경로 생성
+      const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
       const sketches = [
-        "1_dotori/index.html",
-        "2_nap/index.html",
-        "3_catbus/index.html",
-        "4_forest/index.html",
-        "5_rain/index.html",
+        basePath + "1_dotori/index.html",
+        basePath + "2_nap/index.html",
+        basePath + "3_catbus/index.html",
+        basePath + "4_forest/index.html",
+        basePath + "5_rain/index.html",
         // 여기에 더 많은 스케치를 추가할 수 있습니다.
       ];
 
