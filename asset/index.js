@@ -10,6 +10,11 @@ window.ASSET_INDEX = [
     "thumbnail": "asset/%EA%B3%BD%EC%9D%80%EB%B9%84%20Marimekko/thumbnail.jpg"
   },
   {
+    "name": "권수진 Totoro",
+    "href": "asset/%EA%B6%8C%EC%88%98%EC%A7%84%20Totoro/main.html",
+    "thumbnail": "asset/%EA%B6%8C%EC%88%98%EC%A7%84%20Totoro/thumbnail.png"
+  },
+  {
     "name": "권수현 Maison Margiela",
     "href": "asset/%EA%B6%8C%EC%88%98%ED%98%84%20Maison%20Margiela/main.html",
     "thumbnail": "asset/%EA%B6%8C%EC%88%98%ED%98%84%20Maison%20Margiela/thumbnail.jpg"
@@ -107,6 +112,6 @@ window.ASSET_INDEX = [
 ];
 window.SITE_INFO = {
   "title": "Reactive books 2.0 : Artist Edition",
-  "description": "\"Reactive Books 2.0\"은 학생들이 각자 영감을 받은 예술가와 디자이너의 작품을 시각적 모티프로 삼아, 터치 기반 인터랙션과 물리 엔진을 통해 재해석한 실험적 디자인 작업입니다. 고전 회화부터 현대 브랜드에 이르기까지 다양한 작품들을 출발점으로 삼아, 자신만의 시각적 해석과 감각을 반응형 그래픽 경험에 담았습니다. 정지 이미지로 존재하던 패턴, 형태, 구성 요소들이 손끝의 움직임에 따라 변화하고 반응하며 흥미로운 인터랙션을 만들어냅니다. \n\n* 터치, 멀티터치, 드래그 등의 제스처로 그래픽과 상호작용 할 수 있습니다. 일부 작품은 소리가 함께 재생됩니다. \n* p5.js, matter.js 라이브러리 사용\n* 존 마에다의 Reactive books에 대한 오마주\n\nA student archive from the course Interactive Design (2), 2025 \nCourse led by Narim Lee, Hongik University",
-  "descriptionEn": "“Reactive Books 2.0” is an experimental design project in which students reinterpret the works of artists and designers who inspired them, using touch-based interaction and physics engines. Drawing from a wide range of visual sources—from classical paintings to contemporary brands—they translated their own visual interpretations and sensibilities into responsive graphic experiences. Patterns, forms, and compositional elements once confined to static images shift and react to the movement of touch, creating engaging moments of interaction.\n\n* You can interact with graphics through gestures such as touch, multi-touch, and drag. Some works include sound.\n* Using p5.js, matter.js libraries\n* Homage to John Maeda's Reactive books\n\nA student archive from the course Interactive Design (2), 2025 \nCourse led by Narim Lee, Hongik University"
+  "description": "\"Reactive Books 2.0\"은 학생들이 각자 영감을 받은 예술가와 디자이너의 작품을 시각적 모티프로 삼아, 터치 기반 인터랙션과 물리 엔진을 통해 재해석한 실험적 디자인 작업입니다. 고전 회화부터 현대 브랜드에 이르기까지 다양한 작품들을 출발점으로 삼아, 자신만의 시각적 해석과 감각을 반응형 그래픽 경험에 담았습니다. 정지 이미지로 존재하던 패턴, 형태, 구성 요소들이 손끝의 움직임에 따라 변화하고 반응하며 흥미로운 인터랙션을 만들어냅니다. \n\n* 터치, 멀티터치, 드래그 등의 제스처로 그래픽과 상호작용 할 수 있습니다. 일부 작품은 소리가 함께 재생됩니다. \n* p5.js, matter.js 라이브러리 사용\n* 존 마에다의 Reactive books에 대한 오마주",
+  "descriptionEn": "“Reactive Books 2.0” is an experimental design project in which students reinterpret the works of artists and designers who inspired them, using touch-based interaction and physics engines. Drawing from a wide range of visual sources—from classical paintings to contemporary brands—they translated their own visual interpretations and sensibilities into responsive graphic experiences. Patterns, forms, and compositional elements once confined to static images shift and react to the movement of touch, creating engaging moments of interaction.\n\n* You can interact with graphics through gestures such as touch, multi-touch, and drag. Some works include sound.\n* Using p5.js, matter.js libraries\n* Homage to John Maeda's Reactive books"
 };
